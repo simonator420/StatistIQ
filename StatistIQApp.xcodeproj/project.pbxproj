@@ -29,9 +29,40 @@
 		A96FF69E2E341E770040EC24 /* StatistIQAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StatistIQAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A96FF6C22E3421AB0040EC24 /* Exceptions for "StatistIQApp" folder in "StatistIQApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A96FF6862E341E760040EC24 /* StatistIQApp */;
+		};
+		A96FF6EB2E34264C0040EC24 /* Exceptions for "Fonts" folder in "StatistIQAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Cabin-SemiBold.ttf",
+				"Jost-Medium.ttf",
+				"Jost-SemiBold.ttf",
+			);
+			target = A96FF6932E341E770040EC24 /* StatistIQAppTests */;
+		};
+		A96FF6EC2E34264C0040EC24 /* Exceptions for "Fonts" folder in "StatistIQAppUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Cabin-SemiBold.ttf",
+				"Jost-Medium.ttf",
+				"Jost-SemiBold.ttf",
+			);
+			target = A96FF69D2E341E770040EC24 /* StatistIQAppUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A96FF6892E341E760040EC24 /* StatistIQApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A96FF6C22E3421AB0040EC24 /* Exceptions for "StatistIQApp" folder in "StatistIQApp" target */,
+			);
 			path = StatistIQApp;
 			sourceTree = "<group>";
 		};
@@ -43,6 +74,20 @@
 		A96FF6A12E341E770040EC24 /* StatistIQAppUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = StatistIQAppUITests;
+			sourceTree = "<group>";
+		};
+		A96FF6BC2E341E920040EC24 /* Views */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A96FF6C42E3422AF0040EC24 /* Fonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A96FF6EB2E34264C0040EC24 /* Exceptions for "Fonts" folder in "StatistIQAppTests" target */,
+				A96FF6EC2E34264C0040EC24 /* Exceptions for "Fonts" folder in "StatistIQAppUITests" target */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +120,8 @@
 		A96FF67E2E341E760040EC24 = {
 			isa = PBXGroup;
 			children = (
+				A96FF6C42E3422AF0040EC24 /* Fonts */,
+				A96FF6BC2E341E920040EC24 /* Views */,
 				A96FF6892E341E760040EC24 /* StatistIQApp */,
 				A96FF6972E341E770040EC24 /* StatistIQAppTests */,
 				A96FF6A12E341E770040EC24 /* StatistIQAppUITests */,
@@ -109,6 +156,8 @@
 			);
 			fileSystemSynchronizedGroups = (
 				A96FF6892E341E760040EC24 /* StatistIQApp */,
+				A96FF6BC2E341E920040EC24 /* Views */,
+				A96FF6C42E3422AF0040EC24 /* Fonts */,
 			);
 			name = StatistIQApp;
 			packageProductDependencies = (
@@ -400,6 +449,8 @@
 				DEVELOPMENT_TEAM = U987CZ3358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StatistIQApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +479,8 @@
 				DEVELOPMENT_TEAM = U987CZ3358;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StatistIQApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

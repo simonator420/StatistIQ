@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BottomBar: View {
-    @Binding var selectedTab: String  // <-- tracks active tab
+    @Binding var selectedTab: String  // tracks active tab
 
     var body: some View {
         ZStack {
@@ -55,4 +55,8 @@ struct BottomBar: View {
             }
         }
     }
+}
+
+#Preview {
+    BottomBar(selectedTab: .constant("favorites"))
 }
