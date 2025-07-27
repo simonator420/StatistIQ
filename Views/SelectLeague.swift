@@ -39,7 +39,7 @@ struct SelectLeagueView: View {
                 // Header with close button
                 HStack {
                     Button(action: { onClose(selectedLeague) }) {
-                        Image("X")
+                        Image("X_white")
                             .resizable()
                             .frame(width: 32, height: 32)
                     }
