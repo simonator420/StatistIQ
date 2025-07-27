@@ -91,6 +91,7 @@ struct MatchDetailView: View {
                         
                     }
                     .padding(.horizontal, 24)
+                    .padding(.bottom, 18)
                     
                     HStack(spacing: 0) {
                         ForEach(["Summary", "Games"], id: \.self) { tab in
@@ -99,24 +100,25 @@ struct MatchDetailView: View {
                             }) {
                                 VStack(spacing: 4) {
                                     Text(tab)
-                                        .font(.custom("Jost-SemiBold", size: 18))
+                                        .font(.custom("Jost-SemiBold", size: 16))
                                         .foregroundColor(selectedTab == tab ? .white : .gray)
-                                    
                                     // White if selected, blue if not
                                     Rectangle()
                                         .fill(selectedTab == tab ? Color.white : Color(red: 0.12, green: 0.16, blue: 0.27))
                                         .frame(height: 6)
+                                        
                                 }
                                 .frame(maxWidth: .infinity)
+                                
                             }
                         }
                     }
-                    .padding(.top, 14)
-                    .zIndex(1)
+//                    .padding(.top, 14)
+                    .zIndex(2)
                 }
                 .frame(maxWidth: .infinity)
             }
-            .frame(height: 330)
+            .frame(height: 337.3)
             
             // Scrollable content below top bar
             ScrollView {
@@ -309,12 +311,13 @@ struct MatchDetailView: View {
                             )
                         }
                         .frame(maxWidth: .infinity)
+                        .padding(.top, 25.0)
                     }
                 }
                 .frame(maxWidth: .infinity)
             }
             // Disable scrolling over the the Summary and Games tab
-            .padding(.top, 3)
+//            .padding(.top, 3)
         }
         .overlay(
             Group {

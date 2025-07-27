@@ -50,7 +50,7 @@ struct SelectLeagueView: View {
                     //                        .padding(.leading, 30.0)
                     //                    Spacer()
                 }
-                .padding(.top, 50) // same Y as homepage
+                .padding(.top, 30) // same Y as homepage
                 .padding(.horizontal, 24)
                 
                 // League List
@@ -69,7 +69,7 @@ struct SelectLeagueView: View {
                                     .font(.custom("Jost-SemiBold", size: 16))
                                     .foregroundColor(
                                         selectedLeague == league.name ?
-                                        Color(red: 0.85, green: 0.23, blue: 0.23) :
+                                        Color.gray :
                                             Color.white
                                     )
                                 

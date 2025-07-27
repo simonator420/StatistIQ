@@ -27,7 +27,8 @@ struct InfoSheet: View {
                     .font(.custom("Jost", size: 16))
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.leading)
-                    .padding([.leading, .bottom, .trailing], 25.0)
+                    .padding(.horizontal, 35.0)
+                    .padding(.bottom, 45.0)
             }
             .frame(maxWidth: .infinity)
             .background(Color.white)

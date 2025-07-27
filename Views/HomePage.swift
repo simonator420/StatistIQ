@@ -24,7 +24,7 @@ struct Homepage: View {
                     // Top Bar
                     Color(red: 0.12, green: 0.16, blue: 0.27)
                         .ignoresSafeArea(.all, edges: .top)
-                        .frame(height: 80)
+                        .frame(height: 70)
                         .overlay(
                             Group {
                                 if selectedTab == "matches" {
@@ -35,7 +35,7 @@ struct Homepage: View {
                                     }) {
                                         HStack(spacing: 8) {
                                             Text("Select league")
-                                                .font(.custom("Jost-SemiBold", size: 24))
+                                                .font(.custom("Jost-SemiBold", size: 22))
                                                 .foregroundColor(Color.white)
                                             
                                             Image("chevron_down_white")
@@ -43,10 +43,16 @@ struct Homepage: View {
                                                 .frame(width: 32, height: 32)
                                         }
                                     }
-                                    .padding(.top, 30)
-                                    .padding(.leading, 24)
+                                    
                                 }
-                            },
+                                else if selectedTab == "favorites" {
+                                    Text("Favorites")
+                                        .font(.custom("Jost-SemiBold", size: 22))
+                                        .foregroundColor(Color.white)
+                                }
+                            }
+                                .padding(.top, 25)
+                                .padding(.leading, 24),
                             alignment: .topLeading
                         )
                     
@@ -91,42 +97,44 @@ struct Homepage: View {
                     if showLeagueSelection {
                         ZStack {
                             // Dimmed background (tap to close)
-                            Color.gray.opacity(0.5)
-                                .ignoresSafeArea()
-                                .onTapGesture {
-                                    withAnimation(.easeInOut(duration: 0.25)) {
-                                        showLeagueSelection = false
-                                    }
-                                }
+                            //                            Color.gray.opacity(0.5)
+                            //                                .ignoresSafeArea()
+                            //                                .onTapGesture {
+                            //                                    withAnimation(.easeInOut(duration: 0.25)) {
+                            //                                        showLeagueSelection = false
+                            //                                    }
+                            //                                }
                             
                             // SelectLeagueView fades in
                             VStack {
                                 Spacer()
-                                SelectLeagueView(initialSelectedLeague: currentLeague, onClose: { selected in
+                                SelectLeagueView(initialSelectedLeague: currentLeague ,onClose: { selected in
                                     currentLeague = selected
                                     withAnimation(.easeInOut(duration: 0.25)) {
                                         showLeagueSelection = false
                                     }
                                 })
                                 
-                                .frame(maxHeight: UIScreen.main.bounds.height * 0.7)
+                                .frame(maxHeight: UIScreen.main.bounds.height * 0.55)
                                 .cornerRadius(16)
                             }
                             .ignoresSafeArea(edges: .bottom)
                         }
-                        .animation(.easeInOut(duration: 0.25), value: showLeagueSelection)
+                        .transition(AnyTransition.move(edge: .bottom))
+                        .zIndex(2)
+                        
+                        Color.gray.opacity(0.5)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    showLeagueSelection = false
+                                }
+                            }
+                            .zIndex(0)
                     }
+                    
                 }
             )
-            
-            //        .onAppear {
-            //            for family in UIFont.familyNames.sorted() {
-            //                print("Family: \(family)")
-            //                for name in UIFont.fontNames(forFamilyName: family) {
-            //                    print("    Font: \(name)")
-            //                }
-            //            }
-            //        }
         }
     }
 }
