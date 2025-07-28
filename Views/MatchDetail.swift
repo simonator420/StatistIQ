@@ -142,7 +142,8 @@ struct MatchDetailView: View {
                                         """
                                         showInfoSheet = true
                                         
-                                    }) {
+                                    })
+                                    {
                                         Image(systemName: "info.circle")
                                             .resizable()
                                             .frame(width: 16, height: 16)
@@ -316,23 +317,32 @@ struct MatchDetailView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            // Disable scrolling over the the Summary and Games tab
-//            .padding(.top, 3)
+
         }
         .overlay(
-            Group {
+            ZStack {
                 if showInfoSheet {
+                    // Background fade-in
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .transition(.opacity)
+                        .onTapGesture {
+                            showInfoSheet = false
+                        }
+
+                    // Info Sheet Slide & Fade Animation
                     InfoSheet(infoText: infoText, onDismiss: {
                         showInfoSheet = false
                     })
+                    .transition(.move(edge: .bottom))
                     .zIndex(2)
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: showInfoSheet)
         )
         .background(Color.white.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
     }
-    
 }
 
 #Preview {

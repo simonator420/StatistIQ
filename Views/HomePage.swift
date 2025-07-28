@@ -96,16 +96,6 @@ struct Homepage: View {
                 Group {
                     if showLeagueSelection {
                         ZStack {
-                            // Dimmed background (tap to close)
-                            //                            Color.gray.opacity(0.5)
-                            //                                .ignoresSafeArea()
-                            //                                .onTapGesture {
-                            //                                    withAnimation(.easeInOut(duration: 0.25)) {
-                            //                                        showLeagueSelection = false
-                            //                                    }
-                            //                                }
-                            
-                            // SelectLeagueView fades in
                             VStack {
                                 Spacer()
                                 SelectLeagueView(initialSelectedLeague: currentLeague ,onClose: { selected in
@@ -132,7 +122,6 @@ struct Homepage: View {
                             }
                             .zIndex(0)
                     }
-                    
                 }
             )
         }

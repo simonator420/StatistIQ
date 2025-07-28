@@ -9,8 +9,8 @@ struct InfoSheet: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             // Dimmed background
-            Color.black.opacity(0.4)
-//                .ignoresSafeArea(edges: .top)
+            Color.clear
+                .contentShape(Rectangle())
                 .onTapGesture { onDismiss() }
             
             // Bottom sheet
