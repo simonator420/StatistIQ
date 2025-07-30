@@ -6,6 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A9E84CD42E3A5C45009575DF /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CD32E3A5C45009575DF /* FirebaseAI */; };
+		A9E84CD62E3A5C45009575DF /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CD52E3A5C45009575DF /* FirebaseAnalytics */; };
+		A9E84CD82E3A5C45009575DF /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CD72E3A5C45009575DF /* FirebaseAuth */; };
+		A9E84CDA2E3A5C45009575DF /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CD92E3A5C45009575DF /* FirebaseCore */; };
+		A9E84CDC2E3A5C45009575DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CDB2E3A5C45009575DF /* FirebaseDatabase */; };
+		A9E84CDE2E3A5C45009575DF /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CDD2E3A5C45009575DF /* FirebaseFirestore */; };
+		A9E84CE02E3A5C45009575DF /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CDF2E3A5C45009575DF /* FirebaseFunctions */; };
+		A9E84CE32E3A5E72009575DF /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CE22E3A5E72009575DF /* GoogleSignIn */; };
+		A9E84CE52E3A5E72009575DF /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CE42E3A5E72009575DF /* GoogleSignInSwift */; };
+		A9E84CEC2E3A698E009575DF /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CEB2E3A698E009575DF /* FacebookBasics */; };
+		A9E84CEE2E3A698E009575DF /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CED2E3A698E009575DF /* FacebookCore */; };
+		A9E84CF02E3A698E009575DF /* FacebookLogin in Frameworks */ = {isa = PBXBuildFile; productRef = A9E84CEF2E3A698E009575DF /* FacebookLogin */; };
+		A9E84D0A2E3AC942009575DF /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = A9E84D092E3AC93F009575DF /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A96FF6952E341E770040EC24 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +43,7 @@
 		A96FF6872E341E760040EC24 /* StatistIQApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StatistIQApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96FF6942E341E770040EC24 /* StatistIQAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StatistIQAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96FF69E2E341E770040EC24 /* StatistIQAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StatistIQAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9E84D092E3AC93F009575DF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -55,6 +72,20 @@
 			);
 			target = A96FF69D2E341E770040EC24 /* StatistIQAppUITests */;
 		};
+		A9E84CD02E3A5A7C009575DF /* Exceptions for "StatistIQApp" folder in "StatistIQAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = A96FF6932E341E770040EC24 /* StatistIQAppTests */;
+		};
+		A9E84CD12E3A5A7C009575DF /* Exceptions for "StatistIQApp" folder in "StatistIQAppUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = A96FF69D2E341E770040EC24 /* StatistIQAppUITests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -62,6 +93,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A96FF6C22E3421AB0040EC24 /* Exceptions for "StatistIQApp" folder in "StatistIQApp" target */,
+				A9E84CD02E3A5A7C009575DF /* Exceptions for "StatistIQApp" folder in "StatistIQAppTests" target */,
+				A9E84CD12E3A5A7C009575DF /* Exceptions for "StatistIQApp" folder in "StatistIQAppUITests" target */,
 			);
 			path = StatistIQApp;
 			sourceTree = "<group>";
@@ -97,6 +130,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9E84CE52E3A5E72009575DF /* GoogleSignInSwift in Frameworks */,
+				A9E84CDC2E3A5C45009575DF /* FirebaseDatabase in Frameworks */,
+				A9E84CE32E3A5E72009575DF /* GoogleSignIn in Frameworks */,
+				A9E84CE02E3A5C45009575DF /* FirebaseFunctions in Frameworks */,
+				A9E84CEE2E3A698E009575DF /* FacebookCore in Frameworks */,
+				A9E84CD62E3A5C45009575DF /* FirebaseAnalytics in Frameworks */,
+				A9E84CD82E3A5C45009575DF /* FirebaseAuth in Frameworks */,
+				A9E84CDA2E3A5C45009575DF /* FirebaseCore in Frameworks */,
+				A9E84CF02E3A698E009575DF /* FacebookLogin in Frameworks */,
+				A9E84CEC2E3A698E009575DF /* FacebookBasics in Frameworks */,
+				A9E84CD42E3A5C45009575DF /* FirebaseAI in Frameworks */,
+				A9E84CDE2E3A5C45009575DF /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,6 +165,7 @@
 		A96FF67E2E341E760040EC24 = {
 			isa = PBXGroup;
 			children = (
+				A9E84D092E3AC93F009575DF /* .gitignore */,
 				A96FF6C42E3422AF0040EC24 /* Fonts */,
 				A96FF6BC2E341E920040EC24 /* Views */,
 				A96FF6892E341E760040EC24 /* StatistIQApp */,
@@ -161,6 +207,18 @@
 			);
 			name = StatistIQApp;
 			packageProductDependencies = (
+				A9E84CD32E3A5C45009575DF /* FirebaseAI */,
+				A9E84CD52E3A5C45009575DF /* FirebaseAnalytics */,
+				A9E84CD72E3A5C45009575DF /* FirebaseAuth */,
+				A9E84CD92E3A5C45009575DF /* FirebaseCore */,
+				A9E84CDB2E3A5C45009575DF /* FirebaseDatabase */,
+				A9E84CDD2E3A5C45009575DF /* FirebaseFirestore */,
+				A9E84CDF2E3A5C45009575DF /* FirebaseFunctions */,
+				A9E84CE22E3A5E72009575DF /* GoogleSignIn */,
+				A9E84CE42E3A5E72009575DF /* GoogleSignInSwift */,
+				A9E84CEB2E3A698E009575DF /* FacebookBasics */,
+				A9E84CED2E3A698E009575DF /* FacebookCore */,
+				A9E84CEF2E3A698E009575DF /* FacebookLogin */,
 			);
 			productName = StatistIQApp;
 			productReference = A96FF6872E341E760040EC24 /* StatistIQApp.app */;
@@ -244,6 +302,11 @@
 			);
 			mainGroup = A96FF67E2E341E760040EC24;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				A9E84CE12E3A5E72009575DF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				A9E84CEA2E3A698E009575DF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A96FF6882E341E760040EC24 /* Products */;
 			projectDirPath = "";
@@ -261,6 +324,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9E84D0A2E3AC942009575DF /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,6 +508,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = StatistIQApp/StatistIQAppDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U987CZ3358;
@@ -474,6 +539,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = StatistIQApp/StatistIQAppRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U987CZ3358;
@@ -611,6 +677,96 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.0.0;
+			};
+		};
+		A9E84CE12E3A5E72009575DF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+		A9E84CEA2E3A698E009575DF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A9E84CD32E3A5C45009575DF /* FirebaseAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAI;
+		};
+		A9E84CD52E3A5C45009575DF /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		A9E84CD72E3A5C45009575DF /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		A9E84CD92E3A5C45009575DF /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		A9E84CDB2E3A5C45009575DF /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		A9E84CDD2E3A5C45009575DF /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		A9E84CDF2E3A5C45009575DF /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CD22E3A5C45009575DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		A9E84CE22E3A5E72009575DF /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CE12E3A5E72009575DF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		A9E84CE42E3A5E72009575DF /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CE12E3A5E72009575DF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		A9E84CEB2E3A698E009575DF /* FacebookBasics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CEA2E3A698E009575DF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookBasics;
+		};
+		A9E84CED2E3A698E009575DF /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CEA2E3A698E009575DF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+		A9E84CEF2E3A698E009575DF /* FacebookLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9E84CEA2E3A698E009575DF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookLogin;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A96FF67F2E341E760040EC24 /* Project object */;
 }

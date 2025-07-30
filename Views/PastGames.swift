@@ -13,7 +13,8 @@ struct PastGameCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.white)
                 .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
-                .frame(width: 313, height: 160)
+                .frame(height: 160)
+                .padding(.horizontal, 16)
             
             VStack(spacing: 8) {
                 // Scores + Logos

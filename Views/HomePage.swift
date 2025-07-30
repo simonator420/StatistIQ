@@ -1,9 +1,12 @@
 import SwiftUI
+import FirebaseAuth
 
 struct Homepage: View {
     @State private var selectedTab: String = "matches"
     @State private var showLeagueSelection = false
     @State private var currentLeague = "NBA"  // default league
+    @State private var isLoggedIn = false
+    @State private var hasFavoriteMatches = false
     
     // Placeholder for future matches
     @State private var matches: [String: [String]] = [
@@ -24,7 +27,7 @@ struct Homepage: View {
                     // Top Bar
                     Color(red: 0.12, green: 0.16, blue: 0.27)
                         .ignoresSafeArea(.all, edges: .top)
-                        .frame(height: 70)
+                        .frame(height: selectedTab == "profile" ? 250 : 60)
                         .overlay(
                             Group {
                                 if selectedTab == "matches" {
@@ -50,9 +53,48 @@ struct Homepage: View {
                                         .font(.custom("Jost-SemiBold", size: 22))
                                         .foregroundColor(Color.white)
                                 }
+                                else if selectedTab == "profile" {
+                                    VStack{
+                                        HStack(){
+                                            Text("Profile")
+                                                .font(.custom("Jost-SemiBold", size: 22))
+                                                .foregroundColor(Color.white)
+                                            
+                                            Spacer()
+                                            
+                                            Image("settings")
+                                                .resizable()
+                                                .frame(width: 24, height: 24)
+                                                .padding(.horizontal, 24)
+                                        }
+                                        .padding(.leading, 24)
+                                        
+                                        VStack(spacing: 8) {
+                                            ZStack {
+                                                Image("ellipse")
+                                                    .resizable()
+                                                    .frame(width: 103, height: 103)
+                                                    .background(Color(red: 0.85, green: 0.85, blue: 0.85))
+                                                    .clipShape(Circle())
+                                                
+                                                Image(systemName: "person.fill")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 48, height: 48)
+                                                    .foregroundColor(.white)
+                                            }
+                                            
+                                            Text(isLoggedIn ? (Auth.auth().currentUser?.displayName ?? "User Name") : "User Name")
+                                                .font(.custom("Jost", size: 18).weight(.medium))
+                                                .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
+                                                .padding(.top, 15)
+                                        }
+                                        .padding(.top, 5)
+                                    }
+                                }
                             }
-                                .padding(.top, 25)
-                                .padding(.leading, 24),
+                                .padding(.top, 15)
+                                .padding(.leading, selectedTab == "profile" ? 0 : 24),
                             alignment: .topLeading
                         )
                     
@@ -62,30 +104,113 @@ struct Homepage: View {
                         VStack(spacing: 16) {
                             if selectedTab == "matches" {
                                 if let leagueMatches = matches[currentLeague], !leagueMatches.isEmpty {
-                                    ForEach(leagueMatches, id: \.self) { match in
-                                        NavigationLink(destination: MatchDetailView()) {
-                                            MatchCard()
-                                                .padding(.top, 16)
+                                    ForEach(Array(leagueMatches.enumerated()), id: \.element) { index, match in
+                                        VStack(spacing: 0) {
+                                            NavigationLink(destination: MatchDetailView()) {
+                                                MatchCard()
+                                                    .padding(.top, 16)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
+                                            if index == 0 {
+                                                adBanner()
+                                                    .padding(.top, 16)
+                                            }
                                         }
-                                        .buttonStyle(PlainButtonStyle())
                                     }
                                 } else {
-                                    Text("No matches available for \(currentLeague)")
+                                    VStack(spacing: 16) {
+                                        adBanner()
+                                            .padding(.top, 16)
+                                        
+                                        Text("No matches available for \(currentLeague)")
+                                            .font(.custom("Jost-Medium", size: 18))
+                                            .foregroundColor(.gray)
+                                            .padding(.top, 20)
+                                    }                                }
+                            } else if selectedTab == "favorites" {
+                                if !isLoggedIn {
+                                    VStack(spacing: 20) {
+                                        Image(systemName: "person.crop.circle")
+                                            .resizable()
+                                            .frame(width: 48, height: 48)
+                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
+                                            .padding(.top, 40)
+                                        
+                                        // Sign-in text
+                                        Text("Sign in to view the matches of your favorite teams.")
+                                            .font(.custom("Jost", size: 16).weight(.medium))
+                                            .multilineTextAlignment(.center)
+                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
+                                            .frame(width: 270, alignment: .center)
+                                        
+                                        NavigationLink(destination: SignInView()) {
+                                            signInButton()
+                                        }
+                                        .padding(.top, 16)
+                                    }
+                                    .padding(.top, 119)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    
+                                } else if isLoggedIn && !hasFavoriteMatches {
+                                    VStack(spacing: 20) {
+                                        // Calendar icon (replace with your <IconCalendar /> if needed)
+                                        Image(systemName: "calendar")
+                                            .resizable()
+                                            .frame(width: 48, height: 48)
+                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
+                                            .padding(.top, 40)
+                                        
+                                        // No matches text
+                                        Text("Check back later — we'll show upcoming matches as soon as they're scheduled.")
+                                            .font(.custom("Jost", size: 16).weight(.medium))
+                                            .multilineTextAlignment(.center)
+                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
+                                            .frame(width: 296, alignment: .center)
+                                    }
+                                    .padding(.top, 160)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    
+                                } else if isLoggedIn && hasFavoriteMatches {
+                                    // TODO: Implement the display of favorite teams here
+                                    Text("Favorites will be here")
                                         .font(.custom("Jost-Medium", size: 18))
-                                        .foregroundColor(.gray)
                                         .padding(.top, 40)
                                 }
-                            } else if selectedTab == "favorites" {
-                                Text("Favorites will be here")
-                                    .font(.custom("Jost-Medium", size: 18))
-                                    .padding(.top, 40)
+                                
                             } else if selectedTab == "profile" {
-                                Text("User Profile")
-                                    .font(.custom("Jost-Medium", size: 18))
-                                    .padding(.top, 40)
+                                if !isLoggedIn {
+                                    VStack(spacing: 20) {
+                                        Text("Sign in for the best user experience!")
+                                            .font(.custom("Jost", size: 16).weight(.medium))
+                                            .multilineTextAlignment(.center)
+                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
+                                            .frame(width: 270, alignment: .center)
+                                        
+                                        NavigationLink(destination: SignInView()) {
+                                            signInButton()
+                                        }
+                                        .padding(.top, 16)
+                                        
+                                    }
+                                    .padding(.top, 60)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                } else if isLoggedIn {
+                                    Button("Log out") {
+                                        try? Auth.auth().signOut()
+                                        UserDefaults.standard.set(false, forKey: "isLoggedIn")
+                                        isLoggedIn = false
+                                    }
+                                }
+                                
                             }
                         }
                     }
+                    
+                    if !isLoggedIn && (selectedTab == "favorites" || selectedTab == "profile") {
+                        adBanner()
+                            .padding(.bottom, 32)
+                    }
+                    
                     // Bottom Bar
                     BottomBar(selectedTab: $selectedTab)
                         .frame(height: 40)
@@ -113,7 +238,7 @@ struct Homepage: View {
                         .transition(AnyTransition.move(edge: .bottom))
                         .zIndex(2)
                         
-                        Color.gray.opacity(0.5)
+                        Color.black.opacity(0.5)
                             .ignoresSafeArea()
                             .onTapGesture {
                                 withAnimation(.easeInOut(duration: 0.25)) {
@@ -125,8 +250,42 @@ struct Homepage: View {
                 }
             )
         }
+        .onAppear {
+            // Check Firebase or stored flag
+            if Auth.auth().currentUser != nil || UserDefaults.standard.bool(forKey: "isLoggedIn") {
+                isLoggedIn = true
+            } else {
+                isLoggedIn = false
+            }
+        }
+    }
+    
+    
+    func signInButton() -> some View {
+        Text("Sign in")
+            .font(.custom("Jost", size: 16).weight(.medium))
+            .multilineTextAlignment(.center)
+            .foregroundColor(.white)
+            .frame(width: 129, height: 40)
+            .background(Color(red: 0.12, green: 0.16, blue: 0.27))
+            .cornerRadius(10)
+    }
+    
+    
+    func adBanner() -> some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(Color.gray)
+            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
+            .frame(height: 60)
+            .padding(.horizontal, 16)
+            .overlay(
+                Text("Ad Banner")
+                    .foregroundColor(.black) // Text color
+                    .font(.custom("Jost-Medium", size: 16))
+            )
     }
 }
+
 
 #Preview {
     Homepage()

@@ -6,9 +6,10 @@ struct MatchCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.white)
                 .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
-                .frame(width: 313, height: 320)
+                .frame(height: 290)
+                .padding(.horizontal, 16)
 
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 // Logos + Names
                 HStack {
                     VStack(spacing: 4) {
@@ -51,7 +52,7 @@ struct MatchCard: View {
                         .font(.custom("Jost-Medium", size: 32))
                         .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                 }
-                .padding(.horizontal, 75)
+                .padding(.horizontal, 85)
 
                 // Time and Venue
                 VStack(spacing: 4) {
@@ -64,7 +65,6 @@ struct MatchCard: View {
                         .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                 }
             }
-            .padding(.vertical, 24)
         }
     }
 }
