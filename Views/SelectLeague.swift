@@ -43,12 +43,6 @@ struct SelectLeagueView: View {
                             .resizable()
                             .frame(width: 32, height: 32)
                     }
-                    
-                    //                    Text("Select league")
-                    //                        .font(.custom("Jost-SemiBold", size: 24))
-                    //                        .foregroundColor(Color(red: 0.85, green: 0.23, blue: 0.23))
-                    //                        .padding(.leading, 30.0)
-                    //                    Spacer()
                 }
                 .padding(.top, 30) // same Y as homepage
                 .padding(.horizontal, 24)

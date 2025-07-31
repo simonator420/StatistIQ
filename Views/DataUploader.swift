@@ -1,16 +1,29 @@
-import Foundation
+import SwiftUI
 
-class TeamsViewModel: ObservableObject {
-    @Published var teams: [Team] = []
+struct DataUploader: View {
     private let apiService = APIService()
     private let firestoreService = FirestoreService()
     
-    func loadTeams() {
-        apiService.fetchTeams { [weak self] teams in
+    @State private var uploadDone = false
+    
+    var body: some View {
+        VStack {
+            if uploadDone {
+                Text("✅ Operation was completed.")
+            } else {
+                Text("⏳ Loading...")
+                    .onAppear {
+                        uploadTeamsOnce()
+                    }
+            }
+        }
+    }
+    
+    private func uploadTeamsOnce() {
+        apiService.fetchTeams { teams in
+            firestoreService.saveTeams(teams)
             DispatchQueue.main.async {
-                self?.teams = teams
-                self?.firestoreService.saveTeams(teams)
-                print("✅ Týmy byly načteny a uloženy do Firestore!")
+                uploadDone = true
             }
         }
     }

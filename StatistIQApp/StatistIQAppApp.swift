@@ -42,7 +42,7 @@ struct StatistIQApp: App {
         WindowGroup {
             // Use Homepage as entry point
             NavigationStack {
-                Homepage()
+                SplashView()
             }
         }
     }

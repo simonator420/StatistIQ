@@ -123,6 +123,16 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
+		A9E84D0B2E3B7187009575DF /* Services */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A9E84D0F2E3B71B1009575DF /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Models;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +175,8 @@
 		A96FF67E2E341E760040EC24 = {
 			isa = PBXGroup;
 			children = (
+				A9E84D0F2E3B71B1009575DF /* Models */,
+				A9E84D0B2E3B7187009575DF /* Services */,
 				A9E84D092E3AC93F009575DF /* .gitignore */,
 				A96FF6C42E3422AF0040EC24 /* Fonts */,
 				A96FF6BC2E341E920040EC24 /* Views */,
@@ -204,6 +216,8 @@
 				A96FF6892E341E760040EC24 /* StatistIQApp */,
 				A96FF6BC2E341E920040EC24 /* Views */,
 				A96FF6C42E3422AF0040EC24 /* Fonts */,
+				A9E84D0B2E3B7187009575DF /* Services */,
+				A9E84D0F2E3B71B1009575DF /* Models */,
 			);
 			name = StatistIQApp;
 			packageProductDependencies = (

@@ -279,7 +279,7 @@ struct Homepage: View {
         let db = Firestore.firestore()
         db.collection("users").document(uid).getDocument { snapshot, error in
             if let error = error {
-                print("❌ Failed to fetch user: \(error.localizedDescription)")
+                print("Failed to fetch user: \(error.localizedDescription)")
                 completion(nil)
                 return
             }
