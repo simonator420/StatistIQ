@@ -1,6 +1,7 @@
 import SwiftUI
 import FirebaseCore
 import FirebaseAuth
+import FirebaseFirestore
 import GoogleSignIn
 import FacebookLogin
 import AuthenticationServices
@@ -172,7 +173,7 @@ struct SignInView: View {
         
         if case let .success(auth) = result {
             guard let appleIDCredentials = auth.credential as? ASAuthorizationAppleIDCredential else {
-                print("AppleAuthorization failed: AppleID credential not available")
+                print("❌ AppleAuthorization failed: AppleID credential not available")
                 alertMessage = "Apple Sign In failed: Credential not available"
                 showAlert = true
                 isLoading = false
@@ -181,80 +182,143 @@ struct SignInView: View {
             
             Task {
                 do {
-                    let result = try await authManager.appleAuth(
+                    let authResult = try await authManager.appleAuth(
                         appleIDCredentials,
                         nonce: AppleSignInManager.nonce
                     )
                     
-                    await MainActor.run {
-                        if result != nil {
-                            dismiss()
+                    guard let authResult = authResult else {
+                        await MainActor.run {
+                            alertMessage = "Apple Sign In failed: No result"
+                            showAlert = true
+                            isLoading = false
                         }
+                        return
+                    }
+                    
+                    // ✅ Extract user details
+                    let uid = authResult.user.uid
+                    let email = authResult.user.email ?? appleIDCredentials.email ?? ""
+                    
+                    // Full name may only be available on first login
+                    let fullName = [
+                        appleIDCredentials.fullName?.givenName,
+                        appleIDCredentials.fullName?.familyName
+                    ].compactMap { $0 }.joined(separator: " ")
+                    
+                    let isNew = authResult.additionalUserInfo?.isNewUser ?? false
+                    
+                    if isNew {
+                        // Create a default username
+                        let username = email.isEmpty ? "apple_user\(Int.random(in: 1000...9999))" : email.components(separatedBy: "@").first!
+                        
+                        saveUserToFirestore(uid: uid, username: username, email: email, name: fullName)
+                    } else {
+                        fetchUserProfile(uid: uid) { data in
+                            if let data = data {
+                                print("✅ Returning Apple user: \(data["username"] ?? "Unknown")")
+                            }
+                        }
+                    }
+                    
+                    await MainActor.run {
+                        UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                        dismiss()
                         isLoading = false
                     }
                 } catch {
                     await MainActor.run {
-                        print("AppleAuthorization failed: \(error)")
+                        print("❌ AppleAuthorization failed: \(error)")
                         alertMessage = "Apple Sign In failed: \(error.localizedDescription)"
                         showAlert = true
                         isLoading = false
                     }
                 }
             }
-        }
-        else if case let .failure(error) = result {
-            print("AppleAuthorization failed: \(error)")
+        } else if case let .failure(error) = result {
+            print("❌ AppleAuthorization failed: \(error)")
             alertMessage = "Apple Sign In failed: \(error.localizedDescription)"
             showAlert = true
             isLoading = false
         }
     }
     
+    
     func signInWithGoogle() {
         guard let clientID = FirebaseApp.app()?.options.clientID else { return }
-        
-        // Configure Google Sign-In
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
-        // Start Sign-In Flow
         GIDSignIn.sharedInstance.signIn(withPresenting: getRootViewController()) { result, error in
             guard error == nil else {
-                print("❌ Google Sign-In failed: \(error!.localizedDescription)")
+                print("Google Sign-In failed: \(error!.localizedDescription)")
                 return
             }
-            
             guard let user = result?.user,
-                  let idToken = user.idToken?.tokenString else {
-                print("❌ Missing Google user or ID token")
-                return
-            }
+                  let idToken = user.idToken?.tokenString else { return }
             
-            // Create Firebase credential
             let credential = GoogleAuthProvider.credential(withIDToken: idToken,
                                                            accessToken: user.accessToken.tokenString)
             
-            // Sign in to Firebase with the credential
             Auth.auth().signIn(with: credential) { authResult, error in
                 if let error = error {
-                    print("❌ Firebase Sign-In error: \(error.localizedDescription)")
-                } else {
-                    print("User signed in: \(authResult?.user.email ?? "")")
-                    
-                    // Save login state
-                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
-                    
-                    // Close SignInView
-                    dismiss()
+                    print("Firebase Sign-In error: \(error.localizedDescription)")
+                    return
                 }
+                guard let authResult = authResult else { return }
+                
+                let uid = authResult.user.uid
+                let email = authResult.user.email ?? ""
+                let displayName = authResult.user.displayName ?? user.profile?.name ?? ""
+                let isNew = authResult.additionalUserInfo?.isNewUser ?? false
+                
+                if isNew {
+                    let username = email.isEmpty ? "google_user\(Int.random(in: 1000...9999))" : email.components(separatedBy: "@").first!
+                    saveUserToFirestore(uid: uid, username: username, email: email, name: displayName)
+                }
+                
+                UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                dismiss()
             }
+        }
+    }
+    
+    // MARK: - Firestore Helpers
+    func saveUserToFirestore(uid: String, username: String, email: String, name: String) {
+        let db = Firestore.firestore()
+        let userData: [String: Any] = [
+            "id": uid,
+            "username": username,
+            "email": email,
+            "name": name,
+            "createdAt": Timestamp()
+        ]
+        
+        db.collection("users").document(uid).setData(userData, merge: true) { error in
+            if let error = error {
+                print("Failed to save user: \(error.localizedDescription)")
+            } else {
+                print("User saved/updated in Firestore: \(username)")
+            }
+        }
+    }
+    
+    
+    func fetchUserProfile(uid: String, completion: @escaping ([String: Any]?) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).getDocument { snapshot, error in
+            if let error = error {
+                print("Failed to fetch user: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            completion(snapshot?.data())
         }
     }
     
     func signInWithFacebook() {
         let loginManager = LoginManager()
         
-        // Start the classic Facebook login flow
         loginManager.logIn(permissions: ["public_profile", "email"], from: getRootViewController()) { result, error in
             if let error = error {
                 print("Facebook Login failed: \(error.localizedDescription)")
@@ -262,10 +326,12 @@ struct SignInView: View {
             }
             
             guard let result = result, !result.isCancelled else {
+                print("Facebook Login cancelled by user")
                 return
             }
             
             guard let accessToken = AccessToken.current?.tokenString else {
+                print("Failed to get Facebook access token")
                 return
             }
             
@@ -274,14 +340,31 @@ struct SignInView: View {
             Auth.auth().signIn(with: credential) { authResult, error in
                 if let error = error {
                     print("Firebase Sign-In with Facebook failed: \(error.localizedDescription)")
-                } else {
-                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
-                    dismiss()
+                    return
                 }
+                
+                guard let authResult = authResult else { return }
+                let uid = authResult.user.uid
+                let email = authResult.user.email ?? ""
+                let displayName = authResult.user.displayName ?? ""
+                let isNew = authResult.additionalUserInfo?.isNewUser ?? false
+                
+                if isNew {
+                    let username = email.isEmpty ? "fb_user\(Int.random(in: 1000...9999))" : email.components(separatedBy: "@").first!
+                    saveUserToFirestore(uid: uid, username: username, email: email, name: displayName)
+                } else {
+                    fetchUserProfile(uid: uid) { data in
+                        if let data = data {
+                            print("Returning Facebook user: \(data["username"] ?? "Unknown")")
+                        }
+                    }
+                }
+                
+                UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                dismiss()
             }
         }
     }
-    
     
     func makeAttributedText() -> AttributedString {
         var fullText = AttributedString("By signing in you agree with StatistIQ's Privacy Policy and Terms of Use.")

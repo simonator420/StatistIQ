@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
 struct Homepage: View {
     @State private var selectedTab: String = "matches"
@@ -7,6 +8,7 @@ struct Homepage: View {
     @State private var currentLeague = "NBA"  // default league
     @State private var isLoggedIn = false
     @State private var hasFavoriteMatches = false
+    @State private var currentUser: [String: Any] = [:]
     
     // Placeholder for future matches
     @State private var matches: [String: [String]] = [
@@ -84,10 +86,14 @@ struct Homepage: View {
                                                     .foregroundColor(.white)
                                             }
                                             
-                                            Text(isLoggedIn ? (Auth.auth().currentUser?.displayName ?? "User Name") : "User Name")
-                                                .font(.custom("Jost", size: 18).weight(.medium))
-                                                .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
-                                                .padding(.top, 15)
+                                            Text(
+                                                isLoggedIn
+                                                ? (Auth.auth().currentUser?.displayName ?? (currentUser["username"] as? String ?? "User Name"))
+                                                : "User Name"
+                                            )
+                                            .font(.custom("Jost", size: 18).weight(.medium))
+                                            .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
+                                            .padding(.top, 15)
                                         }
                                         .padding(.top, 5)
                                     }
@@ -134,7 +140,7 @@ struct Homepage: View {
                                             .resizable()
                                             .frame(width: 48, height: 48)
                                             .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
-                                            .padding(.top, 40)
+                                            .padding(.top, 20)
                                         
                                         // Sign-in text
                                         Text("Sign in to view the matches of your favorite teams.")
@@ -146,14 +152,14 @@ struct Homepage: View {
                                         NavigationLink(destination: SignInView()) {
                                             signInButton()
                                         }
-                                        .padding(.top, 16)
+                                        .padding(.top, 10)
                                     }
                                     .padding(.top, 119)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     
                                 } else if isLoggedIn && !hasFavoriteMatches {
                                     VStack(spacing: 20) {
-                                        // Calendar icon (replace with your <IconCalendar /> if needed)
+                                        // Calendar icon
                                         Image(systemName: "calendar")
                                             .resizable()
                                             .frame(width: 48, height: 48)
@@ -189,7 +195,7 @@ struct Homepage: View {
                                         NavigationLink(destination: SignInView()) {
                                             signInButton()
                                         }
-                                        .padding(.top, 16)
+                                        .padding(.top, 10)
                                         
                                     }
                                     .padding(.top, 60)
@@ -254,12 +260,32 @@ struct Homepage: View {
             // Check Firebase or stored flag
             if Auth.auth().currentUser != nil || UserDefaults.standard.bool(forKey: "isLoggedIn") {
                 isLoggedIn = true
+                
+                if let uid = Auth.auth().currentUser?.uid {
+                    fetchUserProfile(uid: uid) { data in
+                        if let data = data {
+                            self.currentUser = data
+                        }
+                    }
+                }
+                
             } else {
                 isLoggedIn = false
             }
         }
     }
     
+    func fetchUserProfile(uid: String, completion: @escaping ([String: Any]?) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).getDocument { snapshot, error in
+            if let error = error {
+                print("❌ Failed to fetch user: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            completion(snapshot?.data())
+        }
+    }
     
     func signInButton() -> some View {
         Text("Sign in")

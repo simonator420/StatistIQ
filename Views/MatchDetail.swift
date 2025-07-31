@@ -63,19 +63,31 @@ struct MatchDetailView: View {
                         
                         // Stars centered
                         HStack(spacing: 80) {
-                            Button(action: { isHomeFavorite.toggle() }) {
+                            Button(action: {
+                                if UserDefaults.standard.bool(forKey: "isLoggedIn") {
+                                    isHomeFavorite.toggle()
+                                } else {
+                                    print("User must be logged in to favorite a team")
+                                }
+                            }) {
                                 Image(systemName: isHomeFavorite ? "star.fill" : "star")
                                     .foregroundColor(.white)
                                     .font(.system(size: 18))
                             }
-                            Button(action: { isAwayFavorite.toggle() }) {
+                            
+                            Button(action: {
+                                if UserDefaults.standard.bool(forKey: "isLoggedIn") {
+                                    isAwayFavorite.toggle()
+                                } else {
+                                    print("User must be logged in to favorite a team")
+                                }
+                            }) {
                                 Image(systemName: isAwayFavorite ? "star.fill" : "star")
                                     .foregroundColor(.white)
                                     .font(.system(size: 18))
                             }
-                        }
-                        .padding(.bottom, 45.0)
-                        .frame(maxWidth: .infinity)
+                        }                        .padding(.bottom, 45.0)
+                            .frame(maxWidth: .infinity)
                         
                         // Right team
                         VStack(spacing: 2) {
@@ -106,14 +118,14 @@ struct MatchDetailView: View {
                                     Rectangle()
                                         .fill(selectedTab == tab ? Color.white : Color(red: 0.12, green: 0.16, blue: 0.27))
                                         .frame(height: 6)
-                                        
+                                    
                                 }
                                 .frame(maxWidth: .infinity)
                                 
                             }
                         }
                     }
-//                    .padding(.top, 14)
+                    //                    .padding(.top, 14)
                     .zIndex(2)
                 }
                 .frame(maxWidth: .infinity)
@@ -317,7 +329,7 @@ struct MatchDetailView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-
+            
         }
         .overlay(
             ZStack {
@@ -329,7 +341,7 @@ struct MatchDetailView: View {
                         .onTapGesture {
                             showInfoSheet = false
                         }
-
+                    
                     // Info Sheet Slide & Fade Animation
                     InfoSheet(infoText: infoText, onDismiss: {
                         showInfoSheet = false
@@ -338,7 +350,7 @@ struct MatchDetailView: View {
                     .zIndex(2)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: showInfoSheet)
+                .animation(.easeInOut(duration: 0.3), value: showInfoSheet)
         )
         .background(Color.white.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
