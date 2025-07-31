@@ -9,6 +9,7 @@ import CryptoKit
 
 struct SignInView: View {
     @Environment(\.dismiss) var dismiss
+    var onLogin: (() -> Void)? = nil
     @State private var currentNonce: String?
     
     @StateObject private var authManager = AuthManager()
@@ -223,6 +224,7 @@ struct SignInView: View {
                     
                     await MainActor.run {
                         UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                        onLogin?()
                         dismiss()
                         isLoading = false
                     }
@@ -278,6 +280,7 @@ struct SignInView: View {
                 }
                 
                 UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                onLogin?()
                 dismiss()
             }
         }
@@ -361,6 +364,7 @@ struct SignInView: View {
                 }
                 
                 UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                onLogin?()
                 dismiss()
             }
         }

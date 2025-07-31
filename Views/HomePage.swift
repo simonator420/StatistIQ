@@ -149,7 +149,7 @@ struct Homepage: View {
                                             .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
                                             .frame(width: 270, alignment: .center)
                                         
-                                        NavigationLink(destination: SignInView()) {
+                                        NavigationLink(destination: SignInView(onLogin: { isLoggedIn = true })) {
                                             signInButton()
                                         }
                                         .padding(.top, 10)
@@ -192,7 +192,7 @@ struct Homepage: View {
                                             .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
                                             .frame(width: 270, alignment: .center)
                                         
-                                        NavigationLink(destination: SignInView()) {
+                                        NavigationLink(destination: SignInView(onLogin: { isLoggedIn = true })) {
                                             signInButton()
                                         }
                                         .padding(.top, 10)
