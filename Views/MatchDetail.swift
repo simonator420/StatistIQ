@@ -354,6 +354,7 @@ struct MatchDetailView: View {
         )
         .background(Color.white.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
+        .enableSwipeBack()
     }
 }
 

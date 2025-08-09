@@ -8,11 +8,9 @@ struct SplashView: View {
             Color(red: 0.12, green: 0.16, blue: 0.27)
                 .ignoresSafeArea()
             
-            Text("StatistIQ")
-                .font(.custom("Jost-SemiBold", size: 68))
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-//                .padding(.bottom, 70)
+            Image("text")
+                .resizable()
+                .frame(width: 280, height: 82)
         }
         .onAppear {
             // Delay before navigating to Homepage

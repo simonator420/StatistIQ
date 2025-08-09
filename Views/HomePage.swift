@@ -6,7 +6,7 @@ struct Homepage: View {
     @State private var selectedTab: String = "matches"
     @State private var showLeagueSelection = false
     @State private var currentLeague = "NBA"  // default league
-    @State private var isLoggedIn = false
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @State private var hasFavoriteMatches = false
     @State private var currentUser: [String: Any] = [:]
     
@@ -64,10 +64,13 @@ struct Homepage: View {
                                             
                                             Spacer()
                                             
-                                            Image("settings")
-                                                .resizable()
-                                                .frame(width: 24, height: 24)
-                                                .padding(.horizontal, 24)
+                                            NavigationLink(destination: SettingsView())
+                                            {
+                                                Image("settings")
+                                                    .resizable()
+                                                    .frame(width:24, height:24)
+                                                    .padding(.horizontal, 24)
+                                            }
                                         }
                                         .padding(.leading, 24)
                                         
@@ -86,14 +89,23 @@ struct Homepage: View {
                                                     .foregroundColor(.white)
                                             }
                                             
-                                            Text(
-                                                isLoggedIn
-                                                ? (Auth.auth().currentUser?.displayName ?? (currentUser["username"] as? String ?? "User Name"))
-                                                : "User Name"
-                                            )
-                                            .font(.custom("Jost", size: 18).weight(.medium))
-                                            .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
-                                            .padding(.top, 15)
+                                            if isLoggedIn {
+                                                Text(currentUser["username"] as? String ?? "")
+                                                    .font(.custom("Jost", size: 18).weight(.medium))
+                                                    .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
+                                                    .padding(.top, 15)
+
+                                                if let timestamp = currentUser["createdAt"] as? Timestamp {
+                                                    Text(formattedJoinDate(from: timestamp))
+                                                        .font(.custom("Jost", size: 14))
+                                                        .foregroundColor(Color.gray)
+                                                }
+                                            } else {
+                                                Text("Best platform for AI predictions in sports")
+                                                    .font(.custom("Jost", size: 18).weight(.medium))
+                                                    .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
+                                                    .padding(.top, 15)
+                                            }
                                         }
                                         .padding(.top, 5)
                                     }
@@ -149,7 +161,17 @@ struct Homepage: View {
                                             .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
                                             .frame(width: 270, alignment: .center)
                                         
-                                        NavigationLink(destination: SignInView(onLogin: { isLoggedIn = true })) {
+                                        NavigationLink(destination: SignInView(onLogin: {
+                                            isLoggedIn = true
+                                            if let uid = Auth.auth().currentUser?.uid {
+                                                fetchUserProfile(uid: uid) { data in
+                                                    if let data = data {
+                                                        self.currentUser = data
+                                                    }
+                                                }
+                                            }
+                                        }))
+                                        {
                                             signInButton()
                                         }
                                         .padding(.top, 10)
@@ -192,7 +214,17 @@ struct Homepage: View {
                                             .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
                                             .frame(width: 270, alignment: .center)
                                         
-                                        NavigationLink(destination: SignInView(onLogin: { isLoggedIn = true })) {
+                                        NavigationLink(destination: SignInView(onLogin: {
+                                            isLoggedIn = true
+                                            if let uid = Auth.auth().currentUser?.uid {
+                                                fetchUserProfile(uid: uid) { data in
+                                                    if let data = data {
+                                                        self.currentUser = data
+                                                    }
+                                                }
+                                            }
+                                        }))
+                                        {
                                             signInButton()
                                         }
                                         .padding(.top, 10)
@@ -309,6 +341,15 @@ struct Homepage: View {
                     .foregroundColor(.black) // Text color
                     .font(.custom("Jost-Medium", size: 16))
             )
+    }
+    
+    func formattedJoinDate(from timestamp: Timestamp?) -> String {
+        guard let timestamp = timestamp else { return "" }
+        let date = timestamp.dateValue()
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return "Joined on \(formatter.string(from: date))"
     }
 }
 

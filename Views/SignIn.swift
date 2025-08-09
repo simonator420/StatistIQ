@@ -89,7 +89,7 @@ struct SignInView: View {
                         .background(Color(red: 0.12, green: 0.16, blue: 0.27))
                         .cornerRadius(10)
                         
-                        .allowsHitTesting(false) // This layer won't block touches
+                        .allowsHitTesting(false)
                     }
                     .frame(height: 44)
                     
@@ -105,6 +105,7 @@ struct SignInView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+        .enableSwipeBack()
     }
     
     
@@ -294,6 +295,7 @@ struct SignInView: View {
             "username": username,
             "email": email,
             "name": name,
+            "favoriteTeams": [],
             "createdAt": Timestamp()
         ]
         
@@ -406,7 +408,7 @@ class AppleAuthDelegate: NSObject, ASAuthorizationControllerDelegate {
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let tokenData = appleIDCredential.identityToken,
               let idToken = String(data: tokenData, encoding: .utf8) else {
-            print("❌ Failed to get identity token")
+            print("Failed to get identity token")
             return
         }
         
@@ -419,17 +421,17 @@ class AppleAuthDelegate: NSObject, ASAuthorizationControllerDelegate {
         Task {
             do {
                 let result = try await Auth.auth().signIn(with: credential)
-                print("✅ Apple login successful: \(result.user.uid)")
+                print("Apple login successful: \(result.user.uid)")
                 UserDefaults.standard.set(true, forKey: "isLoggedIn")
                 dismiss()
             } catch {
-                print("❌ Firebase Apple Sign-In failed: \(error.localizedDescription)")
+                print("Firebase Apple Sign-In failed: \(error.localizedDescription)")
             }
         }
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        print("❌ Apple Sign-In failed: \(error.localizedDescription)")
+        print("Apple Sign-In failed: \(error.localizedDescription)")
     }
 }
 

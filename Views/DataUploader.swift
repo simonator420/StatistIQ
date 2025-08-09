@@ -27,4 +27,20 @@ struct DataUploader: View {
             }
         }
     }
+    
+    private func uploadGames() {
+        apiService.fetchGames { games in
+            let limitedGames = Array(games.prefix(5))
+            
+            for game in limitedGames {
+                apiService.fetchStatistics(for: game.id) { stats in
+                    firestoreService.saveGameWithStats(game: game, stats: stats)
+                }
+            }
+            DispatchQueue.main.async {
+                uploadDone = true
+            }
+        }
+    }
+    
 }
