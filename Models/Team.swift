@@ -1,9 +1,21 @@
 import Foundation
 
-struct Team: Codable, Identifiable {
+struct Team: Identifiable, Codable {
     let id: Int
     let name: String
-    let code: String?
+    let code: String
     let logo: String?
-    let country: String?
+    let country: String
+}
+
+struct FirebaseTeam: Identifiable, Codable {
+    let id: Int
+    let name: String
+    let code: String
+    let logo: String?
+    let country: String
+    let abbreviation: String
+    let nba_team: Bool
+    let arena: String?
+    let city: String?
 }

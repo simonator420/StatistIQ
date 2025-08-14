@@ -9,15 +9,10 @@ struct Homepage: View {
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @State private var hasFavoriteMatches = false
     @State private var currentUser: [String: Any] = [:]
+    @StateObject private var net = NetworkMonitor.shared
+    @StateObject private var scheduleStore = GamesScheduleStore()
     
-    // Placeholder for future matches
-    @State private var matches: [String: [String]] = [
-        "NBA": ["Warriors vs Lakers"],
-        "Euroleague": [],
-        "Liga ACB": [],
-        "LNB Élite": [],
-        "Serie A": []
-    ]
+    @State private var userListener: ListenerRegistration?
     
     var body: some View {
         NavigationStack {
@@ -27,222 +22,31 @@ struct Homepage: View {
                 
                 VStack(spacing: 0) {
                     // Top Bar
-                    Color(red: 0.12, green: 0.16, blue: 0.27)
-                        .ignoresSafeArea(.all, edges: .top)
-                        .frame(height: selectedTab == "profile" ? 250 : 60)
-                        .overlay(
-                            Group {
-                                if selectedTab == "matches" {
-                                    Button(action: {
-                                        withAnimation(.easeInOut(duration: 0.25)) {
-                                            showLeagueSelection = true
-                                        }
-                                    }) {
-                                        HStack(spacing: 8) {
-                                            Text("Select league")
-                                                .font(.custom("Jost-SemiBold", size: 22))
-                                                .foregroundColor(Color.white)
-                                            
-                                            Image("chevron_down_white")
-                                                .resizable()
-                                                .frame(width: 32, height: 32)
-                                        }
-                                    }
-                                    
-                                }
-                                else if selectedTab == "favorites" {
-                                    Text("Favorites")
-                                        .font(.custom("Jost-SemiBold", size: 22))
-                                        .foregroundColor(Color.white)
-                                }
-                                else if selectedTab == "profile" {
-                                    VStack{
-                                        HStack(){
-                                            Text("Profile")
-                                                .font(.custom("Jost-SemiBold", size: 22))
-                                                .foregroundColor(Color.white)
-                                            
-                                            Spacer()
-                                            
-                                            NavigationLink(destination: SettingsView())
-                                            {
-                                                Image("settings")
-                                                    .resizable()
-                                                    .frame(width:24, height:24)
-                                                    .padding(.horizontal, 24)
-                                            }
-                                        }
-                                        .padding(.leading, 24)
-                                        
-                                        VStack(spacing: 8) {
-                                            ZStack {
-                                                Image("ellipse")
-                                                    .resizable()
-                                                    .frame(width: 103, height: 103)
-                                                    .background(Color(red: 0.85, green: 0.85, blue: 0.85))
-                                                    .clipShape(Circle())
-                                                
-                                                Image(systemName: "person.fill")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 48, height: 48)
-                                                    .foregroundColor(.white)
-                                            }
-                                            
-                                            if isLoggedIn {
-                                                Text(currentUser["username"] as? String ?? "")
-                                                    .font(.custom("Jost", size: 18).weight(.medium))
-                                                    .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
-                                                    .padding(.top, 15)
-
-                                                if let timestamp = currentUser["createdAt"] as? Timestamp {
-                                                    Text(formattedJoinDate(from: timestamp))
-                                                        .font(.custom("Jost", size: 14))
-                                                        .foregroundColor(Color.gray)
-                                                }
-                                            } else {
-                                                Text("Best platform for AI predictions in sports")
-                                                    .font(.custom("Jost", size: 18).weight(.medium))
-                                                    .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
-                                                    .padding(.top, 15)
-                                            }
-                                        }
-                                        .padding(.top, 5)
-                                    }
-                                }
-                            }
-                                .padding(.top, 15)
-                                .padding(.leading, selectedTab == "profile" ? 0 : 24),
-                            alignment: .topLeading
-                        )
-                    
-                    
-                    // Content: Show matches from selected league
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            if selectedTab == "matches" {
-                                if let leagueMatches = matches[currentLeague], !leagueMatches.isEmpty {
-                                    ForEach(Array(leagueMatches.enumerated()), id: \.element) { index, match in
-                                        VStack(spacing: 0) {
-                                            NavigationLink(destination: MatchDetailView()) {
-                                                MatchCard()
-                                                    .padding(.top, 16)
-                                            }
-                                            .buttonStyle(PlainButtonStyle())
-                                            if index == 0 {
-                                                adBanner()
-                                                    .padding(.top, 16)
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    VStack(spacing: 16) {
-                                        adBanner()
-                                            .padding(.top, 16)
-                                        
-                                        Text("No matches available for \(currentLeague)")
-                                            .font(.custom("Jost-Medium", size: 18))
-                                            .foregroundColor(.gray)
-                                            .padding(.top, 20)
-                                    }                                }
-                            } else if selectedTab == "favorites" {
-                                if !isLoggedIn {
-                                    VStack(spacing: 20) {
-                                        Image(systemName: "person.crop.circle")
-                                            .resizable()
-                                            .frame(width: 48, height: 48)
-                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
-                                            .padding(.top, 20)
-                                        
-                                        // Sign-in text
-                                        Text("Sign in to view the matches of your favorite teams.")
-                                            .font(.custom("Jost", size: 16).weight(.medium))
-                                            .multilineTextAlignment(.center)
-                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
-                                            .frame(width: 270, alignment: .center)
-                                        
-                                        NavigationLink(destination: SignInView(onLogin: {
-                                            isLoggedIn = true
-                                            if let uid = Auth.auth().currentUser?.uid {
-                                                fetchUserProfile(uid: uid) { data in
-                                                    if let data = data {
-                                                        self.currentUser = data
-                                                    }
-                                                }
-                                            }
-                                        }))
-                                        {
-                                            signInButton()
-                                        }
-                                        .padding(.top, 10)
-                                    }
-                                    .padding(.top, 119)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    
-                                } else if isLoggedIn && !hasFavoriteMatches {
-                                    VStack(spacing: 20) {
-                                        // Calendar icon
-                                        Image(systemName: "calendar")
-                                            .resizable()
-                                            .frame(width: 48, height: 48)
-                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
-                                            .padding(.top, 40)
-                                        
-                                        // No matches text
-                                        Text("Check back later — we'll show upcoming matches as soon as they're scheduled.")
-                                            .font(.custom("Jost", size: 16).weight(.medium))
-                                            .multilineTextAlignment(.center)
-                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
-                                            .frame(width: 296, alignment: .center)
-                                    }
-                                    .padding(.top, 160)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    
-                                } else if isLoggedIn && hasFavoriteMatches {
-                                    // TODO: Implement the display of favorite teams here
-                                    Text("Favorites will be here")
-                                        .font(.custom("Jost-Medium", size: 18))
-                                        .padding(.top, 40)
-                                }
-                                
-                            } else if selectedTab == "profile" {
-                                if !isLoggedIn {
-                                    VStack(spacing: 20) {
-                                        Text("Sign in for the best user experience!")
-                                            .font(.custom("Jost", size: 16).weight(.medium))
-                                            .multilineTextAlignment(.center)
-                                            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
-                                            .frame(width: 270, alignment: .center)
-                                        
-                                        NavigationLink(destination: SignInView(onLogin: {
-                                            isLoggedIn = true
-                                            if let uid = Auth.auth().currentUser?.uid {
-                                                fetchUserProfile(uid: uid) { data in
-                                                    if let data = data {
-                                                        self.currentUser = data
-                                                    }
-                                                }
-                                            }
-                                        }))
-                                        {
-                                            signInButton()
-                                        }
-                                        .padding(.top, 10)
-                                        
-                                    }
-                                    .padding(.top, 60)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                } else if isLoggedIn {
-                                    Button("Log out") {
-                                        try? Auth.auth().signOut()
-                                        UserDefaults.standard.set(false, forKey: "isLoggedIn")
-                                        isLoggedIn = false
-                                    }
-                                }
-                                
-                            }
+                    TopBarView(
+                        selectedTab: $selectedTab,
+                        showLeagueSelection: $showLeagueSelection,
+                        currentLeague: $currentLeague,
+                        isLoggedIn: $isLoggedIn,
+                        currentUser: $currentUser,
+                        onUsernameChanged: { updated in
+                            self.currentUser["username"] = updated
                         }
-                    }
+                    )
+                    
+                    // Content
+                    ContentScrollView(
+                        net: net,
+                        selectedTab: $selectedTab,
+                        isLoggedIn: $isLoggedIn,
+                        hasFavoriteMatches: $hasFavoriteMatches,
+                        currentLeague: $currentLeague,
+                        currentUser: $currentUser,
+                        signInButton: { AnyView(self.signInButton()) },
+                        adBanner: { AnyView(self.adBanner()) },
+                        fetchUserProfile: self.fetchUserProfile,
+                        scheduleStore: scheduleStore
+                    )
+
                     
                     if !isLoggedIn && (selectedTab == "favorites" || selectedTab == "profile") {
                         adBanner()
@@ -289,22 +93,33 @@ struct Homepage: View {
             )
         }
         .onAppear {
+            TeamsDirectory.shared.loadIfNeeded()
+            scheduleStore.start()
             // Check Firebase or stored flag
             if Auth.auth().currentUser != nil || UserDefaults.standard.bool(forKey: "isLoggedIn") {
                 isLoggedIn = true
                 
                 if let uid = Auth.auth().currentUser?.uid {
-                    fetchUserProfile(uid: uid) { data in
-                        if let data = data {
-                            self.currentUser = data
-                        }
+                        userListener?.remove()
+                        userListener = Firestore.firestore()
+                            .collection("users")
+                            .document(uid)
+                            .addSnapshotListener { snap, _ in
+                                if let data = snap?.data() {
+                                    self.currentUser = data
+                                }
+                            }
                     }
-                }
                 
             } else {
                 isLoggedIn = false
             }
         }
+        .onDisappear {
+            userListener?.remove()
+            userListener = nil
+        }
+
     }
     
     func fetchUserProfile(uid: String, completion: @escaping ([String: Any]?) -> Void) {

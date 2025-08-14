@@ -1,6 +1,7 @@
 import FirebaseFirestore
 import Combine
 
+
 struct UpcomingCardData: Identifiable {
     let id: Int            // gameId
     let start: Date
@@ -14,12 +15,24 @@ struct UpcomingCardData: Identifiable {
 extension UpcomingCardData {
     init?(doc: DocumentSnapshot) {
         let d = doc.data() ?? [:]
+
+        // Helper to read Int that might be stored as Int / Int64 / NSNumber
+        func readInt(_ any: Any?) -> Int? {
+            switch any {
+            case let x as Int: return x
+            case let x as Int64: return Int(x)
+            case let x as NSNumber: return x.intValue
+            case let s as String: return Int(s)
+            default: return nil
+            }
+        }
+
         guard
-            let gameId = d["gameId"] as? Int,
+            let gameId = readInt(d["gameId"]),
             let ts = d["startTime"] as? Timestamp,
             let teams = d["teams"] as? [String: Any],
-            let homeId = teams["homeId"] as? Int,
-            let awayId = teams["awayId"] as? Int
+            let homeId = readInt(teams["homeId"]),
+            let awayId = readInt(teams["awayId"])
         else { return nil }
         
         let venue = d["venue"] as? String ?? ""
@@ -50,7 +63,7 @@ final class UpcomingGamesVM: ObservableObject {
     deinit { listener?.remove() }
     
     func start() {
-        // Ensure teams are loaded so names/logos appear quickly
+        // Ensure teams are loaded so abbreviations/logos are ready
         teamsDirectory.loadIfNeeded()
         
         listener?.remove()
@@ -75,6 +88,8 @@ final class UpcomingGamesVM: ObservableObject {
             }
     }
     
-    // Convenience passthroughs for the view
-    func team(_ id: Int) -> Team? { teamsDirectory.team(id) }
+    // Convenience passthroughs for the view (Firebase-only)
+    func team(_ id: Int) -> FirebaseTeam? { teamsDirectory.team(id) }
+    func abbreviation(for id: Int) -> String? { teamsDirectory.abbreviation(for: id) }
+
 }

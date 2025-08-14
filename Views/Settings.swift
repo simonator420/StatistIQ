@@ -9,6 +9,11 @@ struct SettingsView: View {
     @State private var showDeleteConfirmation = false
     @State private var showLogoutMessage = false
     
+    @State private var showEditUsername = false
+    @State private var newUsername = ""
+    @State private var isSavingUsername = false
+    var onUsernameChanged: ((String) -> Void)? = nil
+    
     var body: some View {
         ZStack{
             VStack{
@@ -38,6 +43,13 @@ struct SettingsView: View {
                     VStack(spacing: 0) {
                         settingsRow(icon:"gear", title: "System Settings") {
                             openSystemSettings()
+                        }
+                        
+                        if isLoggedIn {
+                            Divider()
+                            settingsRow(icon: "pencil", title: "Edit Username") {
+                                showEditUsername = true
+                            }
                         }
                         
                         Divider()
@@ -89,14 +101,14 @@ struct SettingsView: View {
                                 isLoggedIn = false
                                 showLogoutMessage = true
                                 UserDefaults.standard.set(false, forKey: "isLoggedIn")
-                            
+                                
                                 
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                     showLogoutMessage = false
                                     dismiss()
                                 }
                             }
-
+                            
                         }
                         
                         if isLoggedIn {
@@ -112,6 +124,41 @@ struct SettingsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 20)
                 }
+            }
+            // Username Edit Overlay
+            if showEditUsername {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                
+                VStack(spacing: 20) {
+                    Text("Edit Username")
+                        .font(.custom("Jost-SemiBold", size: 20))
+                    
+                    TextField("Enter new username", text: $newUsername)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal, 20)
+                        .autocapitalization(.none)
+                    
+                    HStack(spacing: 20) {
+                        Button("Cancel") {
+                            showEditUsername = false
+                            newUsername = ""
+                        }
+                        .foregroundColor(.red)
+                        
+                        Button(isSavingUsername ? "Saving..." : "Save") {
+                            saveUsername()
+                        }
+                        .disabled(newUsername.isEmpty || isSavingUsername)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(12)
+                .padding(.horizontal, 40)
+                .shadow(radius: 10)
+                .transition(.scale)
             }
         }
         .overlay(
@@ -132,7 +179,7 @@ struct SettingsView: View {
             alignment: .top
         )
         .animation(.easeInOut(duration: 0.3), value: showLogoutMessage)
-
+        
         .onAppear{
             if Auth.auth().currentUser != nil || UserDefaults.standard.bool(forKey: "isLoggedIn"){
                 isLoggedIn = true
@@ -207,6 +254,24 @@ struct SettingsView: View {
         if let url = URL(string: UIApplication.openSettingsURLString) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+    }
+    
+    func saveUsername() {
+        guard let user = Auth.auth().currentUser else { return }
+        isSavingUsername = true
+        
+        let db = Firestore.firestore()
+        db.collection("users").document(user.uid).updateData(["username": newUsername]) { error in
+            isSavingUsername = false
+            if let error = error {
+                print("Error updating username: \(error.localizedDescription)")
+            } else {
+                print("Username updated successfully")
+                onUsernameChanged?(newUsername)
+                showEditUsername = false
+                newUsername = ""
             }
         }
     }
