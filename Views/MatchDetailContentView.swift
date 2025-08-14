@@ -27,7 +27,7 @@ struct MatchDetailContentView: View {
                                 Text(vm.model?.homeWinText ?? "–")
                                 Text(vm.model?.awayWinText ?? "–")
                             }
-                            .font(.custom("Jost", size: 32).weight(.medium))
+                            .font(.custom("Jost", size: 28).weight(.medium))
                             .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                         }
                         
@@ -44,7 +44,7 @@ struct MatchDetailContentView: View {
                                 Text(vm.model?.homeRangeText ?? "–")
                                 Text(vm.model?.awayRangeText ?? "–")
                             }
-                            .font(.custom("Jost", size: 32).weight(.medium))
+                            .font(.custom("Jost", size: 28).weight(.medium))
                             .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                         }
                         
@@ -58,16 +58,20 @@ struct MatchDetailContentView: View {
                             A positive margin favors the listed team, while a negative margin would favor their opponent. The larger the margin, the more dominant the expected performance.
                             """)
                             Text(vm.model?.expectedMarginText(using: teams) ?? "–")
-                                .font(.custom("Jost", size: 32).weight(.medium))
+                                .font(.custom("Jost", size: 28).weight(.medium))
                                 .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                         }
                         
                         VStack(spacing: 10) {
                             headerWithInfo("Overtime Probability", text: """
-                                Chance the game will be tied after regulation.
+                                Overtime Probability shows the chance the game is tied after regulation.
+                                
+                                It’s derived from our predicted score-margin distribution.
+                                
+                                A higher value means a tighter matchup; overtime is rare, so most games are in the low single digits.
                                 """)
                             Text(vm.model?.overtimeProbabilityText(using: teams) ?? "–")
-                                .font(.custom("Jost", size: 32).weight(.medium))
+                                .font(.custom("Jost", size: 28).weight(.medium))
                                 .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                         }
                         

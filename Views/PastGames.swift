@@ -28,21 +28,21 @@ struct PastGameCard: View {
                             .padding(.leading, homeScore.count == 3 ? 0 : 20)
                         
                         Text(homeScore)
-                            .font(.custom("Jost", size: 32).weight(.medium))
+                            .font(.custom("Jost", size: 28).weight(.medium))
                             .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                             .monospacedDigit()
                             .frame(width: homeScore.count == 3 ? 75 : 55, alignment: .trailing)
                     }
                     
                     Text("–")
-                        .font(.custom("Jost", size: 32).weight(.medium))
+                        .font(.custom("Jost", size: 28).weight(.medium))
                         .foregroundColor(.black)
                         .padding(.horizontal, 15)
                     
                     // Away team (score + logo)
                     HStack(spacing: 2) {
                         Text(awayScore)
-                            .font(.custom("Jost", size: 32).weight(.medium))
+                            .font(.custom("Jost", size: 28).weight(.medium))
                             .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                             .monospacedDigit()
                             .frame(width: awayScore.count == 3 ? 75 : 55, alignment: .leading)
