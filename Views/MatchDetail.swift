@@ -82,7 +82,7 @@ struct MatchDetailView: View {
                                 }
 
                                 // Stars centered horizontally & vertically (no bottom padding hacks)
-                                HStack(spacing: 80) {
+                                HStack(spacing: 75) {
                                     Button {
                                         if Auth.auth().currentUser == nil {
                                             showLoginToast = true
@@ -109,6 +109,7 @@ struct MatchDetailView: View {
                                             .font(.system(size: 18))
                                     }
                                 }
+                                .padding(.bottom, 40)
                             }
                             .padding(.horizontal, 30)
                             .padding(.bottom, 38)

@@ -7,7 +7,7 @@ struct BottomBar: View {
         ZStack {
             Rectangle()
                 .fill(Color.white)
-                .frame(height: 70)
+                .frame(height: 60)
                 .shadow(color: .black.opacity(0.06), radius: 2, x: 0, y: -4)
 
             HStack(spacing: 75) {
@@ -56,7 +56,7 @@ struct BottomBar: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            .padding(.top, 15)
+            .padding(.top, 10)
         }
     }
 }
