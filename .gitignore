@@ -4,3 +4,7 @@
 /Services/
 /StatistIQApp/StatistIQApp/Assets.xcassets
 /Scripts/
+
+# Datasets (ignore)
+Scripts/csv/
+
