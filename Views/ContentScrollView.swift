@@ -225,7 +225,7 @@ struct ContentScrollView: View {
                net.isConnected,
                (scheduleStore.isLoading || !teamsDir.isLoaded) {
                 
-                Color.black.opacity(0.05).ignoresSafeArea().zIndex(1)
+//                Color.black.opacity(0.05).ignoresSafeArea().zIndex(1)
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .secondary))
                     .scaleEffect(1.4)

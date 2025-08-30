@@ -117,18 +117,19 @@ struct MatchCard: View {
                     .padding(.horizontal, hPad)
                     .padding(.bottom, vPad)
                 }
-            } else {
-                // Loading state with rotating circle
-                VStack {
-                    Spacer()
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .secondary))
-                        .scaleEffect(1.4) // makes it a bit bigger
-                    Spacer()
-                }
-                .frame(height: 155)
-                .padding(.horizontal, 12)
             }
+//            else {
+//                // Loading state with rotating circle
+//                VStack {
+//                    Spacer()
+//                    ProgressView()
+//                        .progressViewStyle(CircularProgressViewStyle(tint: .secondary))
+//                        .scaleEffect(1.4) // makes it a bit bigger
+//                    Spacer()
+//                }
+//                .frame(height: 155)
+//                .padding(.horizontal, 12)
+//            }
         }
         .onAppear {
             teams.loadIfNeeded()
