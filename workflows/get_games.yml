@@ -26,8 +26,9 @@ jobs:
       - name: Run update_games.py
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
-        working-directory: ./
         run: |
           echo "$FIREBASE_KEY" > firebase_key.json
+          cd StatistIQ
           python Scripts/update_games.py
+
 
