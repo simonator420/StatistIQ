@@ -28,4 +28,4 @@ jobs:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
         run: |
           echo "$FIREBASE_KEY" > firebase_key.json
-          python StatistIQ/Scripts/update_games.py
+          python Scripts/update_games.py
