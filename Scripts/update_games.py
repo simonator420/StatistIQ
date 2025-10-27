@@ -4,6 +4,8 @@ import pandas as pd
 from datetime import date, timedelta, datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
+import time
+import requests
 
 cred = credentials.Certificate("firebase_key.json")
 firebase_admin.initialize_app(cred)
@@ -48,7 +50,17 @@ season_phase = 'Regular Season'
 games_per_day = 15
 
 # Get games for 2025-26 season
-games = leaguegamefinder.LeagueGameFinder(season_nullable='2025-26')
+MAX_RETRIES = 5
+
+for attempt in range(MAX_RETRIES):
+    try:
+        games = leaguegamefinder.LeagueGameFinder(season_nullable='2025-26')
+        break  # success
+    except requests.exceptions.ReadTimeout:
+        print(f"Timeout on attempt {attempt + 1}/{MAX_RETRIES}, retrying in 10s...")
+        time.sleep(10)
+else:
+    raise SystemExit("Failed to connect to stats.nba.com after multiple retries.")
 
 df = games.get_data_frames()[0]
 df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
