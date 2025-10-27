@@ -23,6 +23,11 @@ jobs:
         run: |
           pip install pandas firebase-admin nba_api
 
+      - name: Debug files
+        run: |
+          pwd
+          ls -R
+
       - name: Run update_games.py
         working-directory: StatistIQ
         env:
