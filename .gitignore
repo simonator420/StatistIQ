@@ -5,3 +5,7 @@
 /StatistIQApp/StatistIQApp/Assets.xcassets
 Scripts/*
 !Scripts/update_games.py
+
+# Ignore all scripts except update_games.py
+Scripts/*
+!Scripts/nba_updater/update_games.py
