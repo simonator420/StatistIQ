@@ -1,0 +1,31 @@
+name: Daily NBA Game Updater
+
+on:
+  schedule:
+    # Run every day at 5:00 AM UTC
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+jobs:
+  update_games:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas firebase-admin nba_api
+
+      - name: Run update_games.py
+        env:
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+        run: |
+          echo "$FIREBASE_KEY" > firebase_key.json
+          python Scripts/update_games.py

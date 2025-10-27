@@ -52,15 +52,16 @@ struct SignInView: View {
                     Text("StatistIQ")
                         .font(.custom("Jost-SemiBold", size: 28))
                         .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
-                        .padding(.top, 80)
+                        .padding(.top, 135)
                     
                     // Sign in buttons
                     socialSignInButton(title: "Sign in with Google", imageName: "google_icon") {
                         signInWithGoogle()
                     }
-                    socialSignInButton(title: "Sign in with Facebook", imageName: "facebook_icon") {
-                        signInWithFacebook()
-                    }
+                    // Dissabled for now - needed to connect in meta developer center
+//                    socialSignInButton(title: "Sign in with Facebook", imageName: "facebook_icon") {
+//                        signInWithFacebook()
+//                    }
                     //                    socialSignInButton(title: "Sign in with Apple", imageName: "apple.logo") {
                     //                        LoginView()
                     //                    }

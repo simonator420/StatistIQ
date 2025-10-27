@@ -8,9 +8,11 @@ struct MatchDetailContentView: View {
     @Binding var selectedTab: String
     @Binding var showInfoSheet: Bool
     @Binding var infoText: String
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ScrollView {
+            
             VStack(spacing: 15) {
                 if selectedTab == "Summary" {
                     Group {
@@ -23,13 +25,23 @@ struct MatchDetailContentView: View {
                                         
                                         A higher percentage means the team is more likely to win — but upsets are always possible.
                                         """)
+
                             HStack(spacing: 120) {
                                 Text(vm.model?.homeWinText ?? "–")
                                 Text(vm.model?.awayWinText ?? "–")
                             }
                             .font(.custom("Jost", size: 28).weight(.medium))
-                            .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                            .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
                         }
+                        .padding(10)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            // lighter than black in dark mode, light gray in light mode
+                            Color(.secondarySystemBackground)
+                        )
+                        .cornerRadius(14)
+                        .padding(.top, 25)
+                        .padding(.horizontal, 12)
                         
                         // Predicted Points Range
                         VStack(spacing: 10) {
@@ -45,8 +57,14 @@ struct MatchDetailContentView: View {
                                 Text(vm.model?.awayRangeText ?? "–")
                             }
                             .font(.custom("Jost", size: 28).weight(.medium))
-                            .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                            .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
                         }
+                        .background(
+                            // lighter than black in dark mode, light gray in light mode
+                            Color(.secondarySystemBackground)
+                        )
+                        .cornerRadius(14)
+                        .padding(.top, 25.0)
                         
                         // Expected Margin
                         VStack(spacing: 10) {
@@ -59,8 +77,14 @@ struct MatchDetailContentView: View {
                             """)
                             Text(vm.model?.expectedMarginText(using: teams) ?? "–")
                                 .font(.custom("Jost", size: 28).weight(.medium))
-                                .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                                .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
                         }
+                        .background(
+                            // lighter than black in dark mode, light gray in light mode
+                            Color(.secondarySystemBackground)
+                        )
+                        .cornerRadius(14)
+                        .padding(.top, 25.0)
                         
                         VStack(spacing: 10) {
                             headerWithInfo("Overtime Probability", text: """
@@ -72,8 +96,14 @@ struct MatchDetailContentView: View {
                                 """)
                             Text(vm.model?.overtimeProbabilityText(using: teams) ?? "–")
                                 .font(.custom("Jost", size: 28).weight(.medium))
-                                .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                                .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
                         }
+                        .background(
+                            // lighter than black in dark mode, light gray in light mode
+                            Color(.secondarySystemBackground)
+                        )
+                        .cornerRadius(14)
+                        .padding(.top, 25.0)
                         
                         // Key Players – keep your placeholder or wire up later
                     }
@@ -125,7 +155,7 @@ struct MatchDetailContentView: View {
                     .foregroundColor(.gray)
             }
         }
-        .padding(.top, 25.0)
+//        .padding(.top, 25.0)
     }
 }
 

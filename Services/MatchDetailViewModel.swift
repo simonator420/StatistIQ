@@ -74,7 +74,7 @@ final class MatchDetailViewModel: ObservableObject {
         group.enter()
         db.collection("games_played")
             .whereField("team_id_home", isEqualTo: teamId)
-            .limit(to: 25)
+            .limit(to: 10)
             .getDocuments { snap, _ in
                 if let s = snap { docs.append(contentsOf: s.documents) }
                 group.leave()
@@ -83,7 +83,7 @@ final class MatchDetailViewModel: ObservableObject {
         group.enter()
         db.collection("games_played")
             .whereField("team_id_away", isEqualTo: teamId)
-            .limit(to: 25)
+            .limit(to:10)
             .getDocuments { snap, _ in
                 if let s = snap { docs.append(contentsOf: s.documents) }
                 group.leave()

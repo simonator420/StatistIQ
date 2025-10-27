@@ -3,11 +3,5 @@
 /StatistIQApp/Info.plist
 /Services/
 /StatistIQApp/StatistIQApp/Assets.xcassets
-/Scripts/
-
-# Datasets (ignore)
-Scripts/csv/
-
-
-Scripts/csv/
-
+Scripts/*
+!Scripts/update_games.py

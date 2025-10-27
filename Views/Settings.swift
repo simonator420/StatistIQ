@@ -9,10 +9,10 @@ struct SettingsView: View {
     @State private var showDeleteConfirmation = false
     @State private var showLogoutMessage = false
     
-    @State private var showEditUsername = false
-    @State private var newUsername = ""
-    @State private var isSavingUsername = false
+    @State private var showEditProfile = false
     var onUsernameChanged: ((String) -> Void)? = nil
+    
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack{
@@ -47,8 +47,8 @@ struct SettingsView: View {
                         
                         if isLoggedIn {
                             Divider()
-                            settingsRow(icon: "pencil", title: "Edit Username") {
-                                showEditUsername = true
+                            settingsRow(icon: "pencil", title: "Edit Profile") {
+                                showEditProfile = true
                             }
                         }
                         
@@ -118,47 +118,22 @@ struct SettingsView: View {
                                 showDeleteConfirmation = true
                             }
                         }
+                        NavigationLink(
+                            destination: EditProfile(
+                                initialUsername: "",                 // EditProfile loads the real name onAppear
+                                onSaved: { updated in
+                                    onUsernameChanged?(updated)      // bubble up to parent if needed
+                                }
+                            ),
+                            isActive: $showEditProfile
+                        ) { EmptyView() }.hidden()
+
                     }
-                    .background(Color.white)
+                    .background(colorScheme == .light ? Color.white : Color.black)
                     .cornerRadius(12)
                     .padding(.horizontal, 16)
                     .padding(.top, 20)
                 }
-            }
-            // Username Edit Overlay
-            if showEditUsername {
-                Color.black.opacity(0.5)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                
-                VStack(spacing: 20) {
-                    Text("Edit Username")
-                        .font(.custom("Jost-SemiBold", size: 20))
-                    
-                    TextField("Enter new username", text: $newUsername)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal, 20)
-                        .autocapitalization(.none)
-                    
-                    HStack(spacing: 20) {
-                        Button("Cancel") {
-                            showEditUsername = false
-                            newUsername = ""
-                        }
-                        .foregroundColor(.red)
-                        
-                        Button(isSavingUsername ? "Saving..." : "Save") {
-                            saveUsername()
-                        }
-                        .disabled(newUsername.isEmpty || isSavingUsername)
-                    }
-                }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(12)
-                .padding(.horizontal, 40)
-                .shadow(radius: 10)
-                .transition(.scale)
             }
         }
         .overlay(
@@ -209,11 +184,20 @@ struct SettingsView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20, height: 20)
-                    .foregroundColor(isLogOut ? .red : .gray)
+                    .foregroundColor(
+                            isLogOut
+                            ? .red
+                            : (colorScheme == .dark ? .white : .black)
+                        )
                 
                 Text(title)
                     .font(.custom("Jost", size: 18).weight(.medium))
-                    .foregroundColor(isLogOut ? .red : .black)
+//                    .foregroundColor(isLogOut ? .red : .black)
+                    .foregroundColor(
+                        isLogOut
+                        ? .red
+                        : (colorScheme == .dark ? .white : .black)
+                    )
                 
                 Spacer()
                 if !isLogOut {
@@ -254,24 +238,6 @@ struct SettingsView: View {
         if let url = URL(string: UIApplication.openSettingsURLString) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
-        }
-    }
-    
-    func saveUsername() {
-        guard let user = Auth.auth().currentUser else { return }
-        isSavingUsername = true
-        
-        let db = Firestore.firestore()
-        db.collection("users").document(user.uid).updateData(["username": newUsername]) { error in
-            isSavingUsername = false
-            if let error = error {
-                print("Error updating username: \(error.localizedDescription)")
-            } else {
-                print("Username updated successfully")
-                onUsernameChanged?(newUsername)
-                showEditUsername = false
-                newUsername = ""
             }
         }
     }

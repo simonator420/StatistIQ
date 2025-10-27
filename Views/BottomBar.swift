@@ -1,63 +1,51 @@
 import SwiftUI
 
 struct BottomBar: View {
-    @Binding var selectedTab: String  // tracks active tab
-
+    @Binding var selectedTab: String
+    @Environment(\.colorScheme) private var colorScheme
+    
+    // TODO Smaller icons, more space below them, less space above them
     var body: some View {
         ZStack {
-            Rectangle()
-                .fill(Color.white)
-                .frame(height: 60)
-                .shadow(color: .black.opacity(0.06), radius: 2, x: 0, y: -4)
+            // Adaptivní pozadí + tenká horní linka
+            Color(colorScheme == .light ? Color.white : Color(.systemGray6))
+                .ignoresSafeArea(edges: .bottom)
+                .overlay(
+                    Rectangle()
+                        .fill(Color(.separator).opacity(0.6))
+                        .frame(height: 0.5),
+                    alignment: .top
+                )
 
-            HStack(spacing: 75) {
-                // Matches
-                Button(action: { selectedTab = "matches" }) {
-                    VStack(spacing: 4) {
-                        Image(systemName: "sportscourt.fill")
-                            .resizable()
-                            .frame(width: 30, height: 24)
-                            .animation(.easeInOut(duration: 0.1), value: selectedTab)
-                            .foregroundColor(selectedTab == "matches" ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.gray)
-                        Text("Matches")
-                            .font(.custom("Jost-Medium", size: 12))
-                            .foregroundColor(selectedTab == "matches" ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.gray)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-
-                // Favorites
-                Button(action: { selectedTab = "favorites" }) {
-                    VStack(spacing: 4) {
-                        Image(systemName: "star")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .animation(.easeInOut(duration: 0.1), value: selectedTab)
-                            .foregroundColor(selectedTab == "favorites" ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.gray)
-                        Text("Favorites")
-                            .font(.custom("Jost-Medium", size: 12))
-                            .foregroundColor(selectedTab == "favorites" ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.gray)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-
-                // Profile
-                Button(action: { selectedTab = "profile" }) {
-                    VStack(spacing: 4) {
-                        Image(systemName: "person")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .animation(.easeInOut(duration: 0.1), value: selectedTab)
-                            .foregroundColor(selectedTab == "profile" ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.gray)
-                        Text("Profile")
-                            .font(.custom("Jost-Medium", size: 12))
-                            .foregroundColor(selectedTab == "profile" ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.gray)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
+            HStack(spacing: 70) {
+                tab(icon: "sportscourt.fill", title: "Matches", key: "matches")
+                tab(icon: "star",             title: "Favorites", key: "favorites")
+                tab(icon: "person",           title: "Profile",   key: "profile")
             }
+            .padding(.horizontal, 24)
             .padding(.top, 10)
+            .padding(.bottom, 50) // rezerva nad home indikátorem
         }
+        .frame(maxWidth: .infinity)
+        .frame(height: 60)
+    }
+
+    @ViewBuilder
+    private func tab(icon: String, title: String, key: String) -> some View {
+        Button { selectedTab = key } label: {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 18)
+                    .foregroundColor(selectedTab == key ? .primary : .secondary)
+                Text(title)
+                    .font(.custom("Jost-Medium", size: 10))
+                    .foregroundColor(selectedTab == key ? .primary : .secondary)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
 

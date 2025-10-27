@@ -11,13 +11,13 @@ struct Homepage: View {
     @State private var currentUser: [String: Any] = [:]
     @StateObject private var net = NetworkMonitor.shared
     @StateObject private var scheduleStore = GamesScheduleStore()
-    
     @State private var userListener: ListenerRegistration?
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.white
+                Color(colorScheme == .light ? Color.white : Color(.black))
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -33,31 +33,54 @@ struct Homepage: View {
                         }
                     )
                     
-                    // Content
-                    ContentScrollView(
-                        net: net,
-                        selectedTab: $selectedTab,
-                        isLoggedIn: $isLoggedIn,
-                        hasFavoriteMatches: $hasFavoriteMatches,
-                        currentLeague: $currentLeague,
-                        currentUser: $currentUser,
-                        signInButton: { AnyView(self.signInButton()) },
-                        adBanner: { AnyView(self.adBanner()) },
-                        fetchUserProfile: self.fetchUserProfile,
-                        scheduleStore: scheduleStore
-                    )
-
-                    
-                    if !isLoggedIn && (selectedTab == "favorites" || selectedTab == "profile") {
-                        adBanner()
-                            .padding(.bottom, 32)
+                    ZStack {
+                        MatchesPage(
+                            net: net,
+                            currentLeague: $currentLeague,
+                            scheduleStore: scheduleStore
+                        )
+                        .opacity(selectedTab == "matches" ? 1 : 0)
+                                .allowsHitTesting(selectedTab == "matches")
+//                                .animation(.easeInOut(duration: 0.22), value: selectedTab)
+                        
+                        FavoritesPage(
+                            isLoggedIn: $isLoggedIn,
+                            currentLeague: $currentLeague,
+                            currentUser: $currentUser,
+                            scheduleStore: scheduleStore,
+                            fetchUserProfile: fetchUserProfile
+                        )
+                        .opacity(selectedTab == "favorites" ? 1 : 0)
+                                .allowsHitTesting(selectedTab == "favorites")
+//                                .animation(.easeInOut(duration: 0.22), value: selectedTab)
+                        ProfilePage(
+                            selectedTab: $selectedTab,
+                            isLoggedIn: $isLoggedIn,
+                            currentUser: $currentUser,
+                            fetchUserProfile: fetchUserProfile
+                        )
+                        .opacity(selectedTab == "profile" ? 1 : 0)
+                                .allowsHitTesting(selectedTab == "profile")
+//                                .animation(.easeInOut(duration: 0.22), value: selectedTab)
                     }
+//                    .tabViewStyle(.page(indexDisplayMode: .never))
                     
-                    // Bottom Bar
-                    BottomBar(selectedTab: $selectedTab)
-                        .frame(height: 40)
+                    
+                    adBanner()
+                        .padding(.bottom, 35)
+                    
+                    
                 }
             }
+            .overlay(
+                VStack {
+                    Spacer()
+                    BottomBar(selectedTab: $selectedTab)
+                }
+                    .ignoresSafeArea(edges: .bottom),
+                alignment: .bottom
+            )
+            
             // Overlay for league selection screen
             .overlay(
                 Group {
@@ -92,24 +115,24 @@ struct Homepage: View {
                 }
             )
         }
+        
         .onAppear {
-            TeamsDirectory.shared.loadIfNeeded()
             scheduleStore.start()
             // Check Firebase or stored flag
             if Auth.auth().currentUser != nil || UserDefaults.standard.bool(forKey: "isLoggedIn") {
                 isLoggedIn = true
                 
                 if let uid = Auth.auth().currentUser?.uid {
-                        userListener?.remove()
-                        userListener = Firestore.firestore()
-                            .collection("users")
-                            .document(uid)
-                            .addSnapshotListener { snap, _ in
-                                if let data = snap?.data() {
-                                    self.currentUser = data
-                                }
+                    userListener?.remove()
+                    userListener = Firestore.firestore()
+                        .collection("users")
+                        .document(uid)
+                        .addSnapshotListener { snap, _ in
+                            if let data = snap?.data() {
+                                self.currentUser = data
                             }
-                    }
+                        }
+                }
                 
             } else {
                 isLoggedIn = false
@@ -119,7 +142,7 @@ struct Homepage: View {
             userListener?.remove()
             userListener = nil
         }
-
+        
     }
     
     func fetchUserProfile(uid: String, completion: @escaping ([String: Any]?) -> Void) {
@@ -146,11 +169,11 @@ struct Homepage: View {
     
     
     func adBanner() -> some View {
-        RoundedRectangle(cornerRadius: 16)
+        Rectangle()
             .fill(Color.gray)
             .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
             .frame(height: 60)
-            .padding(.horizontal, 16)
+        //            .padding(.horizontal, 16)
             .overlay(
                 Text("Ad Banner")
                     .foregroundColor(.black) // Text color

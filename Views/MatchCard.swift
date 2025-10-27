@@ -6,6 +6,7 @@ struct MatchCard: View {
     
     @StateObject private var vm = MatchCardViewModel()
     @ObservedObject private var teams = TeamsDirectory.shared
+    @Environment(\.colorScheme) private var colorScheme
     
     private let corner: CGFloat = 14
     private let hPad: CGFloat = 16
@@ -15,7 +16,7 @@ struct MatchCard: View {
         ZStack {
             RoundedRectangle(cornerRadius: corner)
                 //.fill(Color(.systemBackground))
-                .fill(Color.white)
+                .fill(Color(colorScheme == .light ? Color.white : Color(.systemGray6)))
                 .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
                 .frame(height: 165)
                 .padding(.horizontal, 12)
@@ -29,19 +30,19 @@ struct MatchCard: View {
                     HStack(spacing: 6) {
                         if let start = m.startTime {
                             Text(shortTime(start))
-                                .font(.system(size: 13, weight: .medium))
+                                .font(.custom("Jost", size: 13))
                                 .foregroundColor(.secondary)
                         }
                         
                         Text("·")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(.custom("Jost", size: 13))
                             .foregroundColor(.secondary)
                         
                         if let homeId = m.homeId,
                                let arena = teams.arena(for: homeId),
                                let city = teams.city(for: homeId) {
                                 Text("\(venueShort("\(arena), \(city)"))")
-                                    .font(.system(size: 13, weight: .medium))
+                                    .font(.custom("Jost", size: 13))
                                     .foregroundColor(.secondary)
                                     .lineLimit(1)
                             }
@@ -66,7 +67,7 @@ struct MatchCard: View {
                         
                         VStack(spacing: 4) {
                             Text("–")
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.custom("Jost", size: 14))
                                 .foregroundColor(.secondary)
                             if let edge = edgeText(home: home,
                                                    away: away,
@@ -76,7 +77,7 @@ struct MatchCard: View {
                                                    marginValue: m.marginValue
                             ) {
                                 Text(edge)
-                                    .font(.system(size: 11, weight: .semibold))
+                                    .font(.custom("Jost", size: 11))
                                     .foregroundColor(.secondary)
                                 //                                    .padding(.horizontal, 8)
                                 //                                    .padding(.vertical, 3)
@@ -102,13 +103,13 @@ struct MatchCard: View {
                         
                         HStack {
                             Text("\(abbr(m.homeId)) \(m.homeWinText)")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.custom("Jost", size: 12))
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
                                 .padding(.horizontal, 6)
                             Spacer()
                             Text("\(m.awayWinText) \(abbr(m.awayId))")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.custom("Jost", size: 12))
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
                                 .padding(.horizontal, 6)
@@ -150,9 +151,11 @@ struct MatchCard: View {
                 .scaledToFit()
                 .frame(width: 46, height: 46)
                 .frame(maxWidth: 110, alignment: rightAligned ? .trailing : .leading)
+//                .shadow(color: .white.opacity(1), radius: 0.9, x: 0, y: 0)
 
             Text(ab.isEmpty ? fallback : ab)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.custom("Jost", size: 15).weight(.light))
+        
                 .foregroundColor(.primary)
                 .lineLimit(1)
                 .frame(minWidth: 80, maxWidth: .infinity, alignment: rightAligned ? .trailing : .leading)
@@ -176,6 +179,7 @@ struct MatchCard: View {
             return Image(uiImage: img)
         } else {
             return Image(systemName: "shield.lefthalf.filled")
+            
         }
     }
     

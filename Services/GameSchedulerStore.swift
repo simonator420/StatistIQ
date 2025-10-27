@@ -4,6 +4,7 @@ import FirebaseFirestore
 final class GamesScheduleStore: ObservableObject {
     @Published var gameIds: [Int] = []
     @Published var gameMeta: [Int: (homeId: Int, awayId: Int)] = [:]
+    @Published var gameStart: [Int: Date] = [:]
     
     @Published var isLoading: Bool = false
     private var listener: ListenerRegistration?
@@ -17,6 +18,7 @@ final class GamesScheduleStore: ObservableObject {
     private func handleSnapshot(_ docs: [QueryDocumentSnapshot]) {
         var ids: [Int] = []
         var meta: [Int: (Int, Int)] = [:]
+        var starts: [Int: Date] = [:]
         
         for doc in docs {
             let d = doc.data()
@@ -31,36 +33,48 @@ final class GamesScheduleStore: ObservableObject {
                       let a = asInt(d["team_id_away"]) {
                 meta[gid] = (h, a)
             }
+            
+            if let ts = d["startTime"] as? Timestamp {
+                starts[gid] = ts.dateValue()
+            }
         }
         
         DispatchQueue.main.async {
             self.gameIds = ids
             self.gameMeta = meta
+            self.gameStart = starts
         }
     }
     
     func start() {
-        let db = Firestore.firestore()
-        listener?.remove()
-        isLoading = true
+        // Already listening? do nothing.
+        if listener != nil { return }
+        // Show spinner only if we have no cache yet.
+        isLoading = gameIds.isEmpty
         
-        listener = db.collection("games_schedule")
-            .whereField("startTime", isGreaterThan: Timestamp(date: Date()))
+        let db = Firestore.firestore()
+        let now = Date()
+        
+        // Fetch games from 3 hours ago to 48 hours in the future
+        let pastWindow = now.addingTimeInterval(-10_800) // 3 hours ago
+        let futureWindow = now.addingTimeInterval(172_800) // 48 hours ahead
+        
+        db.collection("games_schedule")
+            .whereField("startTime", isGreaterThanOrEqualTo: Timestamp(date: pastWindow))
+            .whereField("startTime", isLessThanOrEqualTo: Timestamp(date: futureWindow))
             .order(by: "startTime")
-            .addSnapshotListener { [weak self] snap, err in
+            .getDocuments { [weak self] snap, _ in
                 guard let self = self else { return }
                 self.isLoading = false
-                guard let docs = snap?.documents else {
-                    self.gameIds = []
-                    self.gameMeta = [:]
-                    return
-                }
+                guard let docs = snap?.documents else { return }
                 self.handleSnapshot(docs)
             }
     }
     
-    
-    deinit {
+    func stop() {
         listener?.remove()
+        listener = nil
     }
+    
+    deinit { listener?.remove() }
 }

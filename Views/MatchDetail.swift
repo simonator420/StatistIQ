@@ -16,7 +16,7 @@ struct MatchDetailView: View {
     @State private var showInfoSheet = false
     @State private var infoText: String = ""
     @State private var showLoginToast = false
-    
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     let logosSize: Int = 60
     
@@ -173,7 +173,7 @@ struct MatchDetailView: View {
                     }
                         .animation(.easeInOut(duration: 0.3), value: showInfoSheet)
                 )
-                .background(Color.white.ignoresSafeArea())
+                .background(colorScheme == .light ? Color.white.ignoresSafeArea() : Color.black.ignoresSafeArea())
                 .navigationBarBackButtonHidden(true)
                 .enableSwipeBack()
             }
@@ -262,5 +262,5 @@ extension Date {
 
 
 #Preview {
-    MatchDetailView(gameId:123)
+    MatchDetailView(gameId:1)
 }
