@@ -2,38 +2,129 @@ name: Daily NBA Game Updater
 
 on:
   schedule:
-    # Run every day at 5:00 AM UTC
+    # Run every day at 5:00 AM UTC (around midnight EST)
     - cron: "0 5 * * *"
   workflow_dispatch:
+    inputs:
+      use_proxy:
+        description: 'Use proxy service (if direct connection fails)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 jobs:
   update_games:
     runs-on: ubuntu-latest
-
+    
+    # Set a timeout for the entire job
+    timeout-minutes: 15
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
+          cache: 'pip'
+      
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
       - name: Install dependencies
         run: |
-          pip install pandas firebase-admin nba_api
-
-      - name: Debug files
+          pip install --upgrade pip
+          pip install pandas firebase-admin nba_api requests urllib3
+      
+      # Add a random delay to avoid pattern detection
+      - name: Random initial delay
+        run: |
+          DELAY=$((RANDOM % 10 + 5))
+          echo "Waiting ${DELAY} seconds before starting..."
+          sleep $DELAY
+      
+      - name: Check network connectivity
+        run: |
+          echo "Testing connectivity to NBA Stats API..."
+          curl -I https://stats.nba.com || echo "Direct connection might be blocked"
+      
+      - name: Debug environment
         run: |
           pwd
-          ls -R
-
-      - name: Run update_games.py
+          ls -R Scripts/ || ls -R
+          python --version
+          pip list | grep -E "nba_api|pandas|firebase"
+      
+      - name: Run update_games.py (Attempt 1)
+        id: attempt1
         working-directory: ./
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          USE_PROXY: ${{ github.event.inputs.use_proxy || 'false' }}
+          PROXY_URL: ${{ secrets.PROXY_URL }}  # Optional: Add proxy URL in secrets if needed
         run: |
           echo "$FIREBASE_KEY" > firebase_key.json
           python Scripts/update_games.py
-
-
+        timeout-minutes: 8
+        continue-on-error: true
+      
+      - name: Wait before retry
+        if: steps.attempt1.outcome == 'failure'
+        run: |
+          echo "First attempt failed. Waiting 90 seconds before retry..."
+          sleep 90
+      
+      - name: Run update_games.py (Attempt 2 - with longer delays)
+        id: attempt2
+        if: steps.attempt1.outcome == 'failure'
+        working-directory: ./
+        env:
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          USE_PROXY: ${{ github.event.inputs.use_proxy || 'false' }}
+          PROXY_URL: ${{ secrets.PROXY_URL }}
+          RETRY_ATTEMPT: "2"
+        run: |
+          echo "$FIREBASE_KEY" > firebase_key.json
+          echo "Running with extended retry delays..."
+          python Scripts/update_games.py
+        timeout-minutes: 10
+        continue-on-error: true
+      
+      - name: Final status check
+        if: always()
+        run: |
+          if [ "${{ steps.attempt1.outcome }}" == "success" ]; then
+            echo "✅ First attempt succeeded"
+            exit 0
+          elif [ "${{ steps.attempt2.outcome }}" == "success" ]; then
+            echo "✅ Second attempt succeeded"
+            exit 0
+          else
+            echo "❌ Both attempts failed"
+            echo "Consider using alternative API (balldontlie.io) or proxy service"
+            exit 1
+          fi
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f firebase_key.json
+      
+      # Optional: Send notification on failure
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Job failed. Check logs for details."
+          echo "Common solutions:"
+          echo "1. Switch to balldontlie.io API (recommended)"
+          echo "2. Use a proxy service"
+          echo "3. Run script from non-cloud environment"

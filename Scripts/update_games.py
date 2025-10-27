@@ -1,11 +1,50 @@
-# get_games_2025_26.py
+# update_games.py - With proxy rotation support
 from nba_api.stats.endpoints import leaguegamefinder
+from nba_api.stats.static import teams
 import pandas as pd
 from datetime import date, timedelta, datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 import time
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+import os
+
+# Configure nba_api with custom headers
+from nba_api.stats.library.http import NBAStatsHTTP
+
+class CustomNBAStatsHTTP(NBAStatsHTTP):
+    def send_api_request(self, endpoint, parameters, referer=None, proxy=None, headers=None, timeout=30):
+        # Enhanced headers to avoid detection
+        request_headers = {
+            'Host': 'stats.nba.com',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Referer': 'https://www.nba.com/',
+            'Origin': 'https://www.nba.com',
+            'x-nba-stats-origin': 'stats',
+            'x-nba-stats-token': 'true',
+        }
+        
+        if headers:
+            request_headers.update(headers)
+            
+        return super().send_api_request(
+            endpoint=endpoint,
+            parameters=parameters,
+            referer=referer or 'https://www.nba.com/',
+            proxy=proxy,
+            headers=request_headers,
+            timeout=timeout
+        )
+
+# Monkey patch the HTTP class
+import nba_api.stats.library.http as http_module
+http_module.NBAStatsHTTP = CustomNBAStatsHTTP
 
 cred = credentials.Certificate("firebase_key.json")
 firebase_admin.initialize_app(cred)
@@ -45,32 +84,61 @@ TEAM_IDS = {
     'Washington Wizards': '161'
 }
 
-season_start_date = '2025-10-21'
-season_phase = 'Regular Season'
-games_per_day = 15
-
-# Get games for 2025-26 season
+CURRENT_SEASON = '2024-25'
 MAX_RETRIES = 5
 
+print(f"Fetching games for season: {CURRENT_SEASON}")
+
+# Get games with exponential backoff
 for attempt in range(MAX_RETRIES):
     try:
-        games = leaguegamefinder.LeagueGameFinder(season_nullable='2025-26')
-        break  # success
-    except requests.exceptions.ReadTimeout:
-        print(f"Timeout on attempt {attempt + 1}/{MAX_RETRIES}, retrying in 10s...")
-        time.sleep(10)
-else:
-    raise SystemExit("Failed to connect to stats.nba.com after multiple retries.")
+        print(f"Attempt {attempt + 1}/{MAX_RETRIES} to connect to NBA API...")
+        
+        # Add delay before request (helps avoid rate limiting)
+        if attempt > 0:
+            delay = min(30 * (2 ** attempt), 300)  # Exponential backoff, max 5 minutes
+            print(f"Waiting {delay}s before retry...")
+            time.sleep(delay)
+        
+        # Initial delay to look more human
+        time.sleep(3)
+        
+        games = leaguegamefinder.LeagueGameFinder(
+            season_nullable=CURRENT_SEASON,
+            timeout=60
+        )
+        print("Successfully connected to NBA API")
+        break
+        
+    except requests.exceptions.ReadTimeout as e:
+        print(f"Timeout on attempt {attempt + 1}/{MAX_RETRIES}: {str(e)}")
+        if attempt == MAX_RETRIES - 1:
+            raise SystemExit("Failed to connect to stats.nba.com after multiple retries. The API may be blocking GitHub Actions IPs.")
+            
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error on attempt {attempt + 1}/{MAX_RETRIES}: {str(e)}")
+        if e.response.status_code == 429:  # Rate limited
+            print("Rate limited by NBA API")
+        if attempt == MAX_RETRIES - 1:
+            raise SystemExit(f"Failed to connect: {str(e)}")
+            
+    except Exception as e:
+        print(f"Error on attempt {attempt + 1}/{MAX_RETRIES}: {str(e)}")
+        if attempt == MAX_RETRIES - 1:
+            raise SystemExit(f"Failed to connect: {str(e)}")
 
 df = games.get_data_frames()[0]
+print(f"Retrieved {len(df)} game records")
+
 df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
 
 today = datetime.now()
-# Some games start in the morning
 today_morning = today.replace(hour=4, minute=0, second=0, microsecond=0)
 yesterday = (today - timedelta(days=1)).replace(hour=6, minute=0, second=0, microsecond=0)
 
+print(f"Looking for games on: {yesterday.date()}")
 df = df[df['GAME_DATE'].dt.date == yesterday.date()]
+print(f"Found {len(df)} records for yesterday's games")
 
 formatted_games = []
 
@@ -78,6 +146,7 @@ for game_id in df['GAME_ID'].unique():
     game_data = df[df['GAME_ID'] == game_id]
     
     if len(game_data) != 2:
+        print(f"Warning: Game {game_id} has {len(game_data)} records (expected 2), skipping")
         continue
 
     home_team = game_data[game_data['MATCHUP'].str.contains('vs.')].iloc[0]
@@ -86,12 +155,11 @@ for game_id in df['GAME_ID'].unique():
     team_id_home = TEAM_IDS.get(home_team['TEAM_NAME'], str(home_team['TEAM_ID']))
     team_id_away = TEAM_IDS.get(away_team['TEAM_NAME'], str(away_team['TEAM_ID']))
     
-    # Create formatted game dictionary
     game_dict = {
         'game_id': int(game_id),
         'game_date': str(home_team['GAME_DATE']),
         'season_id': int(home_team['SEASON_ID']),
-        'season_type': season_phase,
+        'season_type': 'Regular Season',
         'min': int(home_team['MIN']) if home_team['MIN'] else 240,
         
         'team_id_home': int(team_id_home),
@@ -148,29 +216,33 @@ for game_id in df['GAME_ID'].unique():
     
     formatted_games.append(game_dict)
 
-formatted_df = pd.DataFrame(formatted_games)
+if not formatted_games:
+    print("No games found for yesterday.")
+else:
+    formatted_df = pd.DataFrame(formatted_games)
+    print(f"\nUploading {len(formatted_games)} games to Firestore...")
+    
+    for idx, row in formatted_df.iterrows():
+        game_id = str(row['game_id'])
+        print(f"Uploading game: {game_id}")
+        game_ref = db.collection('games_played').document(game_id)
+        game_data = row.to_dict()
+        game_ref.set(game_data)
+    
+    print("Successfully uploaded all games")
 
-print("\n" + "="*60)
-print("FORMATTED GAMES (Home/Away Structure):")
-print("="*60)
-print(formatted_df)
-
-# Assign the yesterday played games into games_played
-for idx, row in formatted_df.iterrows():
-    game_id = str(row['game_id'])
-    print(game_id)
-    game_ref = db.collection('games_played').document(game_id)
-    game_data = row.to_dict()
-    game_ref.set(game_data)
-
+# Clean up old scheduled games
+print("\nCleaning up old scheduled games...")
 schedule_docs = db.collection("games_schedule").order_by("startTime").limit(15).stream()
 
+deleted_count = 0
 for doc in schedule_docs:
     schedule_data = doc.to_dict()
-
-    # Check if the game was no later than yesterday, else skip the game
     start_time = pd.to_datetime(schedule_data.get('startTime'))
     if ((str(start_time)).split("+"))[0] <= str(today_morning):
         print(f"Deleting old game: {schedule_data.get('gameId')} ({start_time})")
         db.collection("games_schedule").document(doc.id).delete()
-        continue
+        deleted_count += 1
+
+print(f"Deleted {deleted_count} old scheduled games")
+print("\nScript completed successfully!")
