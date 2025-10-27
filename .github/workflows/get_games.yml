@@ -28,7 +28,7 @@ jobs:
           pwd
           ls -R
 
-      - name: Run update_games.py
+      - name: Run python file update_games.py
         working-directory: StatistIQ
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
