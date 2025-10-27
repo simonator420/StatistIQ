@@ -24,11 +24,11 @@ jobs:
           pip install pandas firebase-admin nba_api
 
       - name: Run update_games.py
+        working-directory: StatistIQ
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
         run: |
           echo "$FIREBASE_KEY" > firebase_key.json
-          cd StatistIQ
           python Scripts/update_games.py
 
 
