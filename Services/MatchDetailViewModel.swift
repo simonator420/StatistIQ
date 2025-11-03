@@ -3,68 +3,81 @@ import FirebaseFirestore
 
 final class MatchDetailViewModel: ObservableObject {
     @Published var model: MatchDetailModel?
-    private var listener: ListenerRegistration?
     
     @Published var h2h: [H2HGame] = []
-    private var h2hListenerA: ListenerRegistration?
-    private var h2hListenerB: ListenerRegistration?
+    
     
     @Published var recentHome: [Bool] = []
     @Published var recentAway: [Bool] = []
     @Published var recentReady: Bool = false
     
     func bind(gameId: Int) {
+        if let cached = MatchCache.shared.model(for: gameId) {
+            self.model = cached
+            
+            // ✅ Also load recent results if cached
+            if let recents = MatchCache.shared.recent(for: gameId) {
+                self.recentHome = recents.0
+                self.recentAway = recents.1
+                self.recentReady = true
+            } else {
+                // If not cached yet, fetch them now
+                self.loadRecentGames(for: cached)
+            }
+            
+            self.fetchHeadToHeadFromGamesPlayed(homeId: cached.homeId, awayId: cached.awayId)
+            return
+        }
+        
         let db = Firestore.firestore()
-        listener?.remove()
         recentReady = false
         recentHome = []
         recentAway = []
-        listener = db.collection("games_schedule")
+        
+        db.collection("games_schedule")
             .whereField("gameId", isEqualTo: gameId)
             .limit(to: 1)
-            .addSnapshotListener { [weak self] snap, _ in
+            .getDocuments { [weak self] snap, _ in
                 guard let self = self, let doc = snap?.documents.first else { return }
-                let m = MatchDetailModel(doc: doc)
-                self.model = m
-                self.fetchHeadToHeadFromGamesPlayed(homeId: m.homeId, awayId: m.awayId)
+                let model = MatchDetailModel(doc: doc)
+                self.model = model
+                MatchCache.shared.store(model)
+                self.fetchHeadToHeadFromGamesPlayed(homeId: model.homeId, awayId: model.awayId)
                 
-                let group = DispatchGroup()
-                var didEnter = false
-                
-                if let hid = m.homeId {
-                    didEnter = true
-                    group.enter()
-                    self.fetchRecentForm(for: hid) { arr in
-                        DispatchQueue.main.async {
-                            self.recentHome = arr
-                            group.leave()
-                        }
-                    }
-                }
-                
-                if let aid = m.awayId {
-                    didEnter = true
-                    group.enter()
-                    self.fetchRecentForm(for: aid) { arr in
-                        DispatchQueue.main.async {
-                            self.recentAway = arr
-                            group.leave()
-                        }
-                    }
-                }
-                
-                
-                if !didEnter {
-                    // No team IDs → nothing to wait for
-                    self.recentReady = true
-                    return
-                }
-                
-                group.notify(queue: .main) {
-                    self.recentReady = true
-                }
+                // Fetch recent games once
+                self.loadRecentGames(for: model)
             }
     }
+    
+    private func loadRecentGames(for model: MatchDetailModel) {
+        let group = DispatchGroup()
+        var recentH: [Bool] = []
+        var recentA: [Bool] = []
+        
+        if let hid = model.homeId {
+            group.enter()
+            fetchRecentForm(for: hid) { arr in
+                recentH = arr
+                group.leave()
+            }
+        }
+        
+        if let aid = model.awayId {
+            group.enter()
+            fetchRecentForm(for: aid) { arr in
+                recentA = arr
+                group.leave()
+            }
+        }
+        
+        group.notify(queue: .main) {
+            self.recentHome = recentH
+            self.recentAway = recentA
+            self.recentReady = true
+        }
+    }
+    
+    
     
     private func fetchRecentForm(for teamId: Int, assign: @escaping ([Bool]) -> Void) {
         let db = Firestore.firestore()
@@ -113,65 +126,53 @@ final class MatchDetailViewModel: ObservableObject {
             assign(Array(last5))
         }
     }
+    
     private func fetchHeadToHeadFromGamesPlayed(homeId: Int?, awayId: Int?) {
         guard let h = homeId, let a = awayId else { return }
         let db = Firestore.firestore()
         
         print("H2H fetch for homeId:", h, "awayId:", a)
         
-        // A) home=h, away=a (no orderBy)
-        h2hListenerA = db.collection("games_played")
+        var allDocs: [QueryDocumentSnapshot] = []
+        let group = DispatchGroup()
+        
+        // A) home=h, away=a
+        group.enter()
+        db.collection("games_played")
             .whereField("team_id_home", isEqualTo: h)
             .whereField("team_id_away", isEqualTo: a)
             .limit(to: 25)
-            .addSnapshotListener { [weak self] snap, err in
-                if let err = err { print("H2H A error:", err.localizedDescription); return }
-                print("H2H A docs:", snap?.documents.count ?? 0)
-                self?.mergeH2H(aDocs: snap?.documents ?? [], bDocs: nil)
+            .getDocuments { snap, err in
+                if let err = err { print("H2H A error:", err.localizedDescription) }
+                if let docs = snap?.documents { allDocs.append(contentsOf: docs) }
+                group.leave()
             }
         
-        // B) home=a, away=h (no orderBy)
-        h2hListenerB = db.collection("games_played")
+        // B) home=a, away=h
+        group.enter()
+        db.collection("games_played")
             .whereField("team_id_home", isEqualTo: a)
             .whereField("team_id_away", isEqualTo: h)
             .limit(to: 25)
-            .addSnapshotListener { [weak self] snap, err in
-                if let err = err { print("H2H B error:", err.localizedDescription); return }
-                print("H2H B docs:", snap?.documents.count ?? 0)
-                self?.mergeH2H(aDocs: nil, bDocs: snap?.documents ?? [])
+            .getDocuments { snap, err in
+                if let err = err { print("H2H B error:", err.localizedDescription) }
+                if let docs = snap?.documents { allDocs.append(contentsOf: docs) }
+                group.leave()
             }
         
-    }
-    
-    // keep the latest merged top-5
-    private var cacheA: [QueryDocumentSnapshot] = []
-    private var cacheB: [QueryDocumentSnapshot] = []
-    
-    private func mergeH2H(aDocs: [QueryDocumentSnapshot]?, bDocs: [QueryDocumentSnapshot]?) {
-        if let a = aDocs { cacheA = a }
-        if let b = bDocs { cacheB = b }
-        
-        let all = (cacheA + cacheB)
-            .reduce(into: [String: QueryDocumentSnapshot]()) { acc, doc in
-                acc[doc.documentID] = doc
-            }
-            .values
-        
-        // map -> model, sort by date desc, take 5
-        let items = all
-            .compactMap { H2HGame(doc: $0) }
-            .sorted(by: { ($0.startTime ?? .distantPast) > ($1.startTime ?? .distantPast) })
-            .prefix(5)
-        
-        DispatchQueue.main.async {
+        group.notify(queue: .main) {
+            let items = allDocs
+                .compactMap { H2HGame(doc: $0) }
+                .sorted(by: { ($0.startTime ?? .distantPast) > ($1.startTime ?? .distantPast) })
+                .prefix(5)
+            
             self.h2h = Array(items)
         }
     }
     
+    
     func stop() {
-        listener?.remove(); listener = nil
-        h2hListenerA?.remove(); h2hListenerA = nil
-        h2hListenerB?.remove(); h2hListenerB = nil
+        
     }
     
     private static func matchupKey(_ a: Int, _ b: Int) -> String {
@@ -179,7 +180,6 @@ final class MatchDetailViewModel: ObservableObject {
         return "\(lo)_\(hi)"
     }
     
-    deinit { listener?.remove() }
 }
 
 struct MatchDetailModel {
@@ -227,7 +227,7 @@ struct MatchDetailModel {
             
             // Overtime probability
             overtimeProbability = (predictions["overtimeProbability"] as? NSNumber)?.doubleValue
-                ?? predictions["overtimeProbability"] as? Double
+            ?? predictions["overtimeProbability"] as? Double
             
             if let pr = predictions["pointsRange"] as? [String: Any],
                let h = pr["home"] as? [String: Any],

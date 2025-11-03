@@ -262,5 +262,5 @@ extension Date {
 
 
 #Preview {
-    MatchDetailView(gameId:1)
+    MatchDetailView(gameId:1000)
 }
