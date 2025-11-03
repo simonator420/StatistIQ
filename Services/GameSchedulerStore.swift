@@ -2,12 +2,16 @@ import SwiftUI
 import FirebaseFirestore
 
 final class GamesScheduleStore: ObservableObject {
+    static let shared = GamesScheduleStore()
+    
     @Published var gameIds: [Int] = []
     @Published var gameMeta: [Int: (homeId: Int, awayId: Int)] = [:]
     @Published var gameStart: [Int: Date] = [:]
     
     @Published var isLoading: Bool = false
     private var listener: ListenerRegistration?
+    
+    private init() {}
     
     private func asInt(_ any: Any?) -> Int? {
         if let i = any as? Int { return i }
@@ -29,7 +33,7 @@ final class GamesScheduleStore: ObservableObject {
                let h = asInt(teams["homeId"]),
                let a = asInt(teams["awayId"]) {
                 meta[gid] = (h, a)
-            } else if let h = asInt(d["team_id_home"]),   // optional fallback
+            } else if let h = asInt(d["team_id_home"]),
                       let a = asInt(d["team_id_away"]) {
                 meta[gid] = (h, a)
             }
@@ -47,7 +51,6 @@ final class GamesScheduleStore: ObservableObject {
     }
     
     func start() {
-        // Already listening? do nothing.
         if listener != nil { return }
         // Show spinner only if we have no cache yet.
         isLoading = gameIds.isEmpty

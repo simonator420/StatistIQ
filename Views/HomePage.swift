@@ -10,7 +10,7 @@ struct Homepage: View {
     @State private var hasFavoriteMatches = false
     @State private var currentUser: [String: Any] = [:]
     @StateObject private var net = NetworkMonitor.shared
-    @StateObject private var scheduleStore = GamesScheduleStore()
+    @StateObject private var scheduleStore = GamesScheduleStore.shared
     @State private var userListener: ListenerRegistration?
     @Environment(\.colorScheme) var colorScheme
     

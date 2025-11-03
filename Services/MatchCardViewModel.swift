@@ -1,29 +1,55 @@
 import SwiftUI
 import FirebaseFirestore
+import Combine
 
 final class MatchCardViewModel: ObservableObject {
+    @Published var homeId: Int?
+    @Published var awayId: Int?
+    @Published var startTime: Date?
     @Published var model: MatchModel?
-    private var listener: ListenerRegistration?
-    private let teamsDirectory = TeamsDirectory.shared
+    
+    private let scheduleStore = GamesScheduleStore.shared
+    private var cancellables = Set<AnyCancellable>()
     
     func bind(gameId: Int) {
-        let db = Firestore.firestore()
-        listener?.remove()
-        listener = db.collection("games_schedule")
-            .whereField("gameId", isEqualTo: gameId)
-            .limit(to: 1)
-            .addSnapshotListener { [weak self] snap, err in
-                guard let self = self, let doc = snap?.documents.first else { return }
-                self.model = MatchModel(doc: doc)
+        // Fetch immediately if available
+        updateValues(for: gameId)
+        
+        // Listen for store updates
+        scheduleStore.$gameMeta
+            .combineLatest(scheduleStore.$gameStart)
+            .sink { [weak self] _, _ in
+                self?.updateValues(for: gameId)
             }
+            .store(in: &cancellables)
+    }
+    
+    private func updateValues(for gameId: Int) {
+        guard let meta = scheduleStore.gameMeta[gameId] else {
+            model = nil
+            return
+        }
+
+        let start = scheduleStore.gameStart[gameId]
+        
+        // ✅ Create a MatchModel using the available data
+        model = MatchModel(
+            id: "\(gameId)",
+            gameId: gameId,
+            homeId: meta.homeId,
+            awayId: meta.awayId,
+            startTime: start,
+            venue: nil,
+            winHome: nil,
+            winAway: nil,
+            marginFavTeamId: nil,
+            marginValue: nil
+        )
     }
     
     func stop() {
-        listener?.remove()
-        listener = nil
+        cancellables.removeAll()
     }
-    
-    deinit { listener?.remove() }
 }
 
 struct MatchModel {
@@ -100,3 +126,30 @@ struct MatchModel {
         return s
     }
 }
+
+extension MatchModel {
+    init(
+        id: String,
+        gameId: Int,
+        homeId: Int?,
+        awayId: Int?,
+        startTime: Date?,
+        venue: String?,
+        winHome: Double?,
+        winAway: Double?,
+        marginFavTeamId: Int?,
+        marginValue: Double?
+    ) {
+        self.id = id
+        self.gameId = gameId
+        self.homeId = homeId
+        self.awayId = awayId
+        self.startTime = startTime
+        self.venue = venue
+        self.winHome = winHome
+        self.winAway = winAway
+        self.marginFavTeamId = marginFavTeamId
+        self.marginValue = marginValue
+    }
+}
+
