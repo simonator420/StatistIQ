@@ -13,3 +13,7 @@ Scripts/fetch_games.py
 Scripts/statistiq-5158d-firebase-adminsdk-fbsvc-51f4cb04e0.json
 Scripts/upload_games.py
 !Scripts/nba_updater/update_games.py
+!Scripts/ai/utils/data_handler.py
+Scripts/ai/utils/games.csv
+Scripts/ai/utils/team_ids.csv
+Scripts/ai/utils/team_statistics.csv
