@@ -3,17 +3,19 @@
 /StatistIQApp/Info.plist
 /Services/
 /StatistIQApp/StatistIQApp/Assets.xcassets
-# Scripts/*
-# !Scripts/update_games.py
-
-# Ignore all scripts except update_games.py
 Scripts/nba_updater/firebase_key.json
 Scripts/nba_updater/requirements.txt
 Scripts/fetch_games.py
 Scripts/statistiq-5158d-firebase-adminsdk-fbsvc-51f4cb04e0.json
 Scripts/upload_games.py
 !Scripts/nba_updater/update_games.py
+
 !Scripts/ai/utils/data_handler.py
 Scripts/ai/utils/games.csv
 Scripts/ai/utils/team_ids.csv
 Scripts/ai/utils/team_statistics.csv
+!Scripts/ai/train/winning_percentage.py
+Scripts/ai/train/__pycache__
+Scripts/ai/__pycache__
+Scripts/ai/utils/__pycache__
+Scripts/__pycache__

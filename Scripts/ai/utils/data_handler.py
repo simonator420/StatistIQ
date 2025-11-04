@@ -1,12 +1,19 @@
 import pandas as pd
 import datetime as dt
+import os
 
-df = pd.read_csv('team_statistics.csv')
+base_dir = os.path.dirname(__file__)
+csv_path = os.path.join(base_dir, 'team_statistics.csv')
+ids_path = os.path.join(base_dir, 'team_ids.csv')
+games_path = os.path.join(base_dir, 'games.csv')
+
+# Load the main file for the original statistics
+df = pd.read_csv(csv_path)
 
 # Get only games from 2016 and earlier
 df = df.loc[df['gameDate'].astype(str).str[:4].astype('int') > 2015].copy()
 
-team_ids = pd.read_csv('team_ids.csv').set_index('Team')['ID']
+team_ids = pd.read_csv(ids_path).set_index('Team')['ID']
 
 # Match the team ids from the document to those in my db
 def repair_team_id(df):
@@ -85,6 +92,8 @@ def prepare_dataset(df):
 
     merged.to_csv("games.csv", index=False)
     return merged
-        
-if __name__ == '__main__':
-    prepare_dataset(df)
+
+# Function to retrieve the games dataset 
+def get_games():
+    df = pd.read_csv(games_path)
+    return df
