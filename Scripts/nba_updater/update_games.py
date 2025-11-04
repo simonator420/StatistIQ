@@ -1,7 +1,15 @@
+"""
+This Cloud Function retrieves the most recent NBA games (from the NBA Stats API)
+and updates a Firestore database with the results.
+
+It also removes outdated games from the "games_schedule" collection to keep the data fresh.
+"""
+
 import functions_framework
 import pandas as pd
 import time
 import requests
+import os
 from datetime import datetime, timedelta
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -11,41 +19,13 @@ cred = credentials.Certificate("firebase_key.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
+base_dir = os.path.dirname(__file__)
+team_ids_path = os.path.join(base_dir, "../ai/utils/team_ids.csv")
+team_ids_df = pd.read_csv(team_ids_path)
+TEAM_IDS = dict(zip(team_ids_df["Team"], team_ids_df["ID"]))
+
 @functions_framework.http
 def update_games(request):
-    TEAM_IDS = {
-        'Atlanta Hawks': '132',
-        'Boston Celtics': '133',
-        'Brooklyn Nets': '134',
-        'Charlotte Hornets': '135',
-        'Chicago Bulls': '136',
-        'Cleveland Cavaliers': '137',
-        'Dallas Mavericks': '138',
-        'Denver Nuggets': '139',
-        'Detroit Pistons': '140',
-        'Golden State Warriors': '141',
-        'Houston Rockets': '142',
-        'Indiana Pacers': '143',
-        'LA Clippers': '144',
-        'Los Angeles Lakers': '145',
-        'Memphis Grizzlies': '146',
-        'Miami Heat': '147',
-        'Milwaukee Bucks': '148',
-        'Minnesota Timberwolves': '149',
-        'New Orleans Pelicans': '150',
-        'New York Knicks': '151',
-        'Oklahoma City Thunder': '152',
-        'Orlando Magic': '153',
-        'Philadelphia 76ers': '154',
-        'Phoenix Suns': '155',
-        'Portland Trail Blazers': '156',
-        'Sacramento Kings': '157',
-        'San Antonio Spurs': '158',
-        'Toronto Raptors': '159',
-        'Utah Jazz': '160',
-        'Washington Wizards': '161'
-    }
-
     season_start_date = '2025-10-21'
     season_phase = 'Regular Season'
     games_per_day = 15

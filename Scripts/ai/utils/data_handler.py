@@ -1,3 +1,11 @@
+"""
+This module handles data preparation and transformation for team and game statistics.
+
+It loads CSV files containing team and game data, cleans and merges them,
+and produces structured datasets for model training or analysis.
+"""
+
+
 import pandas as pd
 import datetime as dt
 import os
