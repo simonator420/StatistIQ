@@ -5,7 +5,6 @@ It loads CSV files containing team and game data, cleans and merges them,
 and produces structured datasets for model training or analysis.
 """
 
-
 import pandas as pd
 import datetime as dt
 import os
@@ -105,3 +104,17 @@ def prepare_dataset(df):
 def get_games():
     df = pd.read_csv(games_path)
     return df
+
+# Compute the head to head for data preprocessing
+def compute_head_to_head_avg(row, df):
+    h, a, date = row["home_teamId"], row["away_teamId"], row["gameDate"]
+    prev = df[
+        (((df["home_teamId"] == h) & (df["away_teamId"] == a)) |
+         ((df["home_teamId"] == a) & (df["away_teamId"] == h))) &
+        (df["gameDate"] < date)
+    ]
+    if prev.empty:
+        return pd.Series([None, None])
+    home_pts = prev[prev["home_teamId"] == h]["home_teamScore"].mean()
+    away_pts = prev[prev["away_teamId"] == a]["away_teamScore"].mean()
+    return pd.Series([home_pts, away_pts])

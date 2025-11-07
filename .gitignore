@@ -19,3 +19,4 @@ Scripts/ai/train/__pycache__
 Scripts/ai/__pycache__
 Scripts/ai/utils/__pycache__
 Scripts/__pycache__
+Scripts/ai/inference/__pycache__
