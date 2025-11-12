@@ -20,3 +20,6 @@ Scripts/ai/__pycache__
 Scripts/ai/utils/__pycache__
 Scripts/__pycache__
 Scripts/ai/inference/__pycache__
+Scripts/ai/scalers
+Scripts/ai/models
+Scripts/ai/data
