@@ -59,12 +59,15 @@ struct MatchDetailContentView: View {
                             .font(.custom("Jost", size: 28).weight(.medium))
                             .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
                         }
+                        .padding(10)
+                        .frame(maxWidth: .infinity)
                         .background(
                             // lighter than black in dark mode, light gray in light mode
                             Color(.secondarySystemBackground)
                         )
                         .cornerRadius(14)
-                        .padding(.top, 25.0)
+                        .padding(.top, 25)
+                        .padding(.horizontal, 12)
                         
                         // Expected Margin
                         VStack(spacing: 10) {
@@ -79,12 +82,15 @@ struct MatchDetailContentView: View {
                                 .font(.custom("Jost", size: 28).weight(.medium))
                                 .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
                         }
+                        .padding(10)
+                        .frame(maxWidth: .infinity)
                         .background(
                             // lighter than black in dark mode, light gray in light mode
                             Color(.secondarySystemBackground)
                         )
                         .cornerRadius(14)
-                        .padding(.top, 25.0)
+                        .padding(.top, 25)
+                        .padding(.horizontal, 12)
                         
                         VStack(spacing: 10) {
                             headerWithInfo("Overtime Probability", text: """
@@ -98,12 +104,15 @@ struct MatchDetailContentView: View {
                                 .font(.custom("Jost", size: 28).weight(.medium))
                                 .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
                         }
+                        .padding(10)
+                        .frame(maxWidth: .infinity)
                         .background(
                             // lighter than black in dark mode, light gray in light mode
                             Color(.secondarySystemBackground)
                         )
                         .cornerRadius(14)
-                        .padding(.top, 25.0)
+                        .padding(.top, 25)
+                        .padding(.horizontal, 12)
                         
                         // Key Players – keep your placeholder or wire up later
                     }

@@ -20,6 +20,7 @@ struct MatchDetailView: View {
     @Environment(\.dismiss) var dismiss
     let logosSize: Int = 60
     
+    
     var body: some View {
         let modelReady = vm.model != nil
         let teamsReady = teams.isLoaded
@@ -262,5 +263,5 @@ extension Date {
 
 
 #Preview {
-    MatchDetailView(gameId:1000)
+    MatchDetailView(gameId:178)
 }

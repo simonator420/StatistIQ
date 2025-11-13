@@ -10,19 +10,60 @@ final class MatchCardViewModel: ObservableObject {
     
     private let scheduleStore = GamesScheduleStore.shared
     private var cancellables = Set<AnyCancellable>()
+    private var predictionListener: ListenerRegistration?
+
     
     func bind(gameId: Int) {
-        // Fetch immediately if available
+
         updateValues(for: gameId)
-        
-        // Listen for store updates
+
+        // Listen for schedule updates
         scheduleStore.$gameMeta
             .combineLatest(scheduleStore.$gameStart)
-            .sink { [weak self] _, _ in
+            .sink { [weak self] meta, start in
                 self?.updateValues(for: gameId)
             }
             .store(in: &cancellables)
+
+        predictionListener?.remove()
+
+        predictionListener = Firestore.firestore()
+            .collection("games_schedule")
+            .document("\(gameId)")
+            .addSnapshotListener { [weak self] snap, err in
+
+                if let err = err {
+                    print("Predictions error for \(gameId):", err)
+                    return
+                }
+
+                guard let snap = snap,
+                      let data = snap.data()
+                else {
+                    print("No schedule doc for \(gameId)")
+                    return
+                }
+
+                // Parse predictions
+                if let predictions = data["predictions"] as? [String: Any] {
+                    let win = predictions["winProbability"] as? [String: Any]
+                    let em  = predictions["expectedMargin"] as? Double
+
+                    let winHome = win?["home"] as? Double
+                    let winAway = win?["away"] as? Double
+
+                    // Merge into existing model
+                    if var current = self?.model {
+                        current.winHome = winHome
+                        current.winAway = winAway
+                        current.marginValue = em
+                        current.marginFavTeamId = nil
+                        self?.model = current
+                    }
+                }
+            }
     }
+
     
     private func updateValues(for gameId: Int) {
         guard let meta = scheduleStore.gameMeta[gameId] else {
@@ -32,7 +73,6 @@ final class MatchCardViewModel: ObservableObject {
 
         let start = scheduleStore.gameStart[gameId]
         
-        // ✅ Create a MatchModel using the available data
         model = MatchModel(
             id: "\(gameId)",
             gameId: gameId,
@@ -49,6 +89,8 @@ final class MatchCardViewModel: ObservableObject {
     
     func stop() {
         cancellables.removeAll()
+        predictionListener?.remove()
+        predictionListener = nil
     }
 }
 
@@ -59,10 +101,10 @@ struct MatchModel {
     let awayId: Int?
     let startTime: Date?
     var venue: String?
-    let winHome: Double?
-    let winAway: Double?
-    let marginFavTeamId: Int?
-    let marginValue: Double?
+    var winHome: Double?
+    var winAway: Double?
+    var marginFavTeamId: Int?
+    var marginValue: Double?
     
     init(doc: QueryDocumentSnapshot) {
         let data = doc.data()
@@ -107,6 +149,7 @@ struct MatchModel {
         }
     }
     
+    
     var homeWinText: String {
         guard let w = winHome else { return "-" }
         return "\(Int((w * 100).rounded()))%"
@@ -126,6 +169,50 @@ struct MatchModel {
         return s
     }
 }
+
+extension MatchModel {
+    init?(doc: DocumentSnapshot) {
+        guard let data = doc.data() else { return nil }
+        
+        id = doc.documentID
+        gameId = data["gameId"] as? Int ?? 0
+        
+        if let teams = data["teams"] as? [String: Any] {
+            homeId = teams["homeId"] as? Int
+            awayId = teams["awayId"] as? Int
+        } else {
+            homeId = nil
+            awayId = nil
+        }
+        
+        if let ts = data["startTime"] as? Timestamp {
+            startTime = ts.dateValue()
+        } else {
+            startTime = nil
+        }
+        
+        venue = data["venue"] as? String
+        
+        if let predictions = data["predictions"] as? [String: Any],
+           let winProb = predictions["winProbability"] as? [String: Any] {
+            winHome = (winProb["home"] as? NSNumber)?.doubleValue ?? winProb["home"] as? Double
+            winAway = (winProb["away"] as? NSNumber)?.doubleValue ?? winProb["away"] as? Double
+        } else {
+            winHome = nil
+            winAway = nil
+        }
+        
+        if let em = (data["predictions"] as? [String: Any])?["expectedMargin"] as? [String: Any] {
+            let fav = em["teamId"] as? NSNumber
+            marginFavTeamId = fav?.intValue ?? em["teamId"] as? Int
+            marginValue = (em["value"] as? NSNumber)?.doubleValue ?? em["value"] as? Double
+        } else {
+            marginFavTeamId = nil
+            marginValue = nil
+        }
+    }
+}
+
 
 extension MatchModel {
     init(

@@ -15,13 +15,12 @@ final class MatchDetailViewModel: ObservableObject {
         if let cached = MatchCache.shared.model(for: gameId) {
             self.model = cached
             
-            // ✅ Also load recent results if cached
+
             if let recents = MatchCache.shared.recent(for: gameId) {
                 self.recentHome = recents.0
                 self.recentAway = recents.1
                 self.recentReady = true
             } else {
-                // If not cached yet, fetch them now
                 self.loadRecentGames(for: cached)
             }
             
@@ -238,10 +237,43 @@ struct MatchDetailModel {
                 awayMax = (a["max"] as? NSNumber)?.intValue ?? a["max"] as? Int
             } else { homeMin = nil; homeMax = nil; awayMin = nil; awayMax = nil }
             
+            // Expected margin – supports both old (dict) and new (plain number) format.
             if let em = predictions["expectedMargin"] as? [String: Any] {
+                // OLD FORMAT: { teamId, value }
                 expectedMarginTeamId = (em["teamId"] as? NSNumber)?.intValue ?? em["teamId"] as? Int
                 expectedMarginValue  = (em["value"]  as? NSNumber)?.doubleValue ?? em["value"]  as? Double
-            } else { expectedMarginTeamId = nil; expectedMarginValue = nil }
+
+            } else if let emNumber = predictions["expectedMargin"] as? NSNumber {
+                // NEW FORMAT: just a number
+                let val = emNumber.doubleValue
+                expectedMarginValue = val
+                
+                // infer favourite: positive -> home, negative -> away
+                if val > 0 {
+                    expectedMarginTeamId = homeId
+                } else if val < 0 {
+                    expectedMarginTeamId = awayId
+                } else {
+                    expectedMarginTeamId = nil
+                }
+
+            } else if let emDouble = predictions["expectedMargin"] as? Double {
+                let val = emDouble
+                expectedMarginValue = val
+                
+                if val > 0 {
+                    expectedMarginTeamId = homeId
+                } else if val < 0 {
+                    expectedMarginTeamId = awayId
+                } else {
+                    expectedMarginTeamId = nil
+                }
+
+            } else {
+                expectedMarginTeamId = nil
+                expectedMarginValue  = nil
+            }
+
         } else {
             winHome = nil; winAway = nil
             homeMin = nil; homeMax = nil; awayMin = nil; awayMax = nil
@@ -271,14 +303,15 @@ struct MatchDetailModel {
     
     func overtimeProbabilityText(using teams: TeamsDirectory) -> String {
         guard let p = overtimeProbability else { return "–" }
-        return String(format: "%.1f%%", p)
+        return String(format: "%.1f%%", p * 100)
     }
     
     func expectedMarginText(using teams: TeamsDirectory) -> String {
         guard let val = expectedMarginValue, let tid = expectedMarginTeamId else { return "–" }
         let name = teams.team(tid)?.name ?? "Team"
-        let sign = val >= 0 ? "+" : ""
-        return "\(sign)\(String(format: "%.1f", val)) \(name)"
+        let sign = val >= 0 ? "+" : "−"
+        let number = abs(val)
+        return "\(sign)\(String(format: "%.1f", number)) \(name)"
     }
 }
 

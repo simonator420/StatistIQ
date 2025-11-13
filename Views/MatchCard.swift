@@ -253,5 +253,5 @@ struct ProbBar: View {
 }
 
 #Preview {
-    MatchCard(gameId: 125)
+    MatchCard(gameId: 178)
 }
