@@ -5,6 +5,7 @@
 /StatistIQApp/StatistIQApp/Assets.xcassets
 Scripts/nba_updater/firebase_key.json
 Scripts/nba_updater/requirements.txt
+Scripts/nba_predictor/requirements.txt
 Scripts/fetch_games.py
 Scripts/statistiq-5158d-firebase-adminsdk-fbsvc-51f4cb04e0.json
 Scripts/upload_games.py

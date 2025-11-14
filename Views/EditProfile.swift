@@ -83,6 +83,7 @@ struct EditProfile: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 20)
             }
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {

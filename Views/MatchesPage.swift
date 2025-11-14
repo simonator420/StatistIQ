@@ -161,8 +161,8 @@ struct MatchesPage: View {
     
     @MainActor
     private func refresh() async {
-        scheduleStore.stop()
-        scheduleStore.start()
-        try? await Task.sleep(nanoseconds: 300_000_000)
+//        scheduleStore.stop()
+//        scheduleStore.start()
+//        try? await Task.sleep(nanoseconds: 300_000_000)
     }
 }
