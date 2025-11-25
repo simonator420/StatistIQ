@@ -5,3 +5,4 @@ google-cloud-firestore==2.*
 pandas
 joblib
 scikit-learn
+nba_api
