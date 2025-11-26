@@ -100,6 +100,28 @@ def get_season_df():
         SEASON_DF = load_season_df(SEASON_STR)
     return SEASON_DF
 
+def get_team_record(df, team_id):
+    if "SEASON_TYPE" in df.columns:
+        df_regular = df[df["SEASON_TYPE"] == "Regular Season"]
+    else:
+        df_regular = df
+    
+    team_games = df_regular[df_regular["TEAM_ID"] == team_id]
+
+    if team_games.empty:
+        return {"wins": 0, "losses": 0, "games": 0}
+
+    wins = (team_games["WL"] == "W").sum()
+    losses = (team_games["WL"] == "L").sum()
+    total = wins + losses
+
+    return {
+        "wins": int(wins),
+        "losses": int(losses),
+        "games": int(total)
+    }
+
+
 def compute_team_features(df, team_id, opponent_id=None):
     team_games = df[df["TEAM_ID"] == team_id]
     if team_games.empty:
@@ -183,7 +205,6 @@ def predict_games(request):
                 print(f"Skipping {game_id}: updated recently")
                 continue
 
-        # read Firebase team IDs
         try:
             home_firebase_id = int(game["teams"]["homeId"])
             away_firebase_id = int(game["teams"]["awayId"])
@@ -198,6 +219,9 @@ def predict_games(request):
         # convert to NBA TEAM_ID
         home_id = team_mapping[home_firebase_id]
         away_id = team_mapping[away_firebase_id]
+        
+        home_record = get_team_record(season_df, home_id)
+        away_record = get_team_record(season_df, away_id)
 
         # features from NBA API
         base_features = build_feature_payload(season_df, home_id, away_id)
@@ -288,6 +312,8 @@ def predict_games(request):
                 "expectedMargin": float(abs(margin)),
                 "overtimeProbability": float(ot_prob),
             },
+            "home_record": home_record,
+            "away_record": away_record,
             "updatedAt": firestore.SERVER_TIMESTAMP
         })
 
