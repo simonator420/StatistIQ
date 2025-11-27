@@ -81,6 +81,7 @@ struct MatchDetailContentView: View {
                             Text(vm.model?.expectedMarginText(using: teams) ?? "–")
                                 .font(.custom("Jost", size: 28).weight(.medium))
                                 .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
+                                .fixedSize(horizontal: true, vertical: false)
                         }
                         .padding(10)
                         .frame(maxWidth: .infinity)

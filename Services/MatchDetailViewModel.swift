@@ -11,6 +11,7 @@ final class MatchDetailViewModel: ObservableObject {
     @Published var recentAway: [Bool] = []
     @Published var recentReady: Bool = false
     
+    
     func bind(gameId: Int) {
         if let cached = MatchCache.shared.model(for: gameId) {
             self.model = cached
@@ -200,6 +201,9 @@ struct MatchDetailModel {
     let expectedMarginTeamId: Int?
     let overtimeProbability: Double?
     
+    let homeRecord: TeamRecord?
+    let awayRecord: TeamRecord?
+    
     init(doc: QueryDocumentSnapshot) {
         let data = doc.data()
         id = doc.documentID
@@ -214,6 +218,17 @@ struct MatchDetailModel {
             startTime = ts.dateValue()
         } else { startTime = nil }
         
+        if let hr = data["home_record"] as? [String: Any] {
+            homeRecord = TeamRecord(dict: hr)
+        } else {
+            homeRecord = nil
+        }
+
+        if let ar = data["away_record"] as? [String: Any] {
+            awayRecord = TeamRecord(dict: ar)
+        } else {
+            awayRecord = nil
+        }
         
         venue = data["venue"] as? String
         
@@ -347,6 +362,24 @@ struct H2HGame: Identifiable {
         }
         
         venue = d["venue"] as? String // only if you store it there
+    }
+}
+
+struct TeamRecord {
+    let wins: Int
+    let losses: Int
+    let games: Int
+
+    init?(dict: [String: Any]) {
+        guard
+            let w = dict["wins"] as? Int,
+            let l = dict["losses"] as? Int,
+            let g = dict["games"] as? Int
+        else { return nil }
+        
+        wins = w
+        losses = l
+        games = g
     }
 }
 

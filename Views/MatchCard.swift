@@ -46,55 +46,75 @@ struct MatchCard: View {
                                     .foregroundColor(.secondary)
                                     .lineLimit(1)
                             }
-                        
-                        //                        Spacer()
-                        //                        Text("Upcoming")
-                        //                            .font(.system(size: 11, weight: .semibold))
-                        //                            .foregroundColor(.secondary)
-                        //                            .padding(.horizontal, 8)
-                        //                            .padding(.vertical, 4)
-                        //                            .background(Color.secondary.opacity(0.12))
-                        //                            .clipShape(Capsule())
                     }
-                    .padding(.horizontal, hPad)
                     .padding(.top, vPad)
                     
                     Divider().opacity(0.12).padding(.horizontal, hPad)
                     
                     // TEAMS ROW — menší loga, zkratky
+//                    HStack(alignment: .center) {
+//                        teamCell(teamId: m.homeId, fallback: "HOME")
+//                        
+//                        VStack(spacing: 4) {
+//                            Text("–")
+//                                .font(.custom("Jost", size: 14))
+//                                .foregroundColor(.secondary)
+//                            if let edge = edgeText(home: home,
+//                                                   away: away,
+//                                                   homeCode: code(m.homeId),
+//                                                   awayCode: code(m.awayId),
+//                                                   marginFavTeamId: m.marginFavTeamId,
+//                                                   marginValue: m.marginValue
+//                            ) {
+//                                Text(edge)
+//                                    .font(.custom("Jost", size: 11))
+//                                    .foregroundColor(.secondary)
+//                                //                                    .padding(.horizontal, 8)
+//                                //                                    .padding(.vertical, 3)
+//                                    .padding(10)
+//                                    .background(Color.secondary.opacity(0.10))
+//                                    .clipShape(Capsule())
+//                                    .lineLimit(1)
+//                                    .fixedSize(horizontal: true, vertical: false)
+//                            }
+//                        }
+//                        .layoutPriority(2)
+//                        
+//                        teamCell(teamId: m.awayId, fallback: "AWAY", rightAligned: true)
+//                    }
+                    // TEAMS COLUMN (vertical stacked team names)
                     HStack(alignment: .center) {
-                        teamCell(teamId: m.homeId, fallback: "HOME")
-                        
-                        VStack(spacing: 4) {
-                            Text("–")
-                                .font(.custom("Jost", size: 14))
-                                .foregroundColor(.secondary)
-                            if let edge = edgeText(home: home,
-                                                   away: away,
-                                                   homeCode: code(m.homeId),
-                                                   awayCode: code(m.awayId),
-                                                   marginFavTeamId: m.marginFavTeamId,
-                                                   marginValue: m.marginValue
-                            ) {
-                                Text(edge)
-                                    .font(.custom("Jost", size: 11))
-                                    .foregroundColor(.secondary)
-                                //                                    .padding(.horizontal, 8)
-                                //                                    .padding(.vertical, 3)
-                                    .padding(10)
-                                    .background(Color.secondary.opacity(0.10))
-                                    .clipShape(Capsule())
-                                    .lineLimit(1)
-                                    .fixedSize(horizontal: true, vertical: false)
-                            }
+
+                        // LEFT SIDE — stacked team names
+                        VStack(alignment: .leading, spacing: 8) {
+                            teamRow(teamId: m.homeId, fallback: "HOME")
+                            teamRow(teamId: m.awayId, fallback: "AWAY")
                         }
-                        .layoutPriority(2)
-                        
-                        teamCell(teamId: m.awayId, fallback: "AWAY", rightAligned: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        if let edge = edgeText(
+                            home: home,
+                            away: away,
+                            homeCode: code(m.homeId),
+                            awayCode: code(m.awayId),
+                            marginFavTeamId: m.marginFavTeamId,
+                            marginValue: m.marginValue
+                        ) {
+                            Text(edge)
+                                .font(.custom("Jost", size: 13))
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.secondary.opacity(0.12))
+                                .clipShape(Capsule())
+                                .lineLimit(1)
+                                .fixedSize(horizontal: true, vertical: false)
+                        }
                     }
-                    .padding(.horizontal, hPad)
+                    .padding(.horizontal, 25)
+                    .padding(.bottom, 5)
                     
-                    // PROBABILITY BAR — kompaktní
+                    // PROBABILITY BAR
                     VStack(spacing: 6) {
                         ProbBar(homePct: home, awayPct: away)
                             .frame(height: 10)
@@ -119,18 +139,6 @@ struct MatchCard: View {
                     .padding(.bottom, vPad)
                 }
             }
-//            else {
-//                // Loading state with rotating circle
-//                VStack {
-//                    Spacer()
-//                    ProgressView()
-//                        .progressViewStyle(CircularProgressViewStyle(tint: .secondary))
-//                        .scaleEffect(1.4) // makes it a bit bigger
-//                    Spacer()
-//                }
-//                .frame(height: 155)
-//                .padding(.horizontal, 12)
-//            }
         }
         .onAppear {
             teams.loadIfNeeded()
@@ -141,28 +149,97 @@ struct MatchCard: View {
     
     // MARK: - Helpers
     
+//    private func teamCell(teamId: Int?, fallback: String, rightAligned: Bool = false) -> some View {
+//        let ab = abbr(teamId)
+//        let logoImg = logo(for: teamId)
+//        
+//        return VStack(spacing: 10) {
+//            logoImg
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 46, height: 46)
+//                .frame(maxWidth: 110, alignment: rightAligned ? .trailing : .leading)
+////                .shadow(color: .white.opacity(1), radius: 0.9, x: 0, y: 0)
+//
+//            Text(ab.isEmpty ? fallback : ab)
+//                .font(.custom("Jost", size: 15).weight(.light))
+//        
+//                .foregroundColor(.primary)
+//                .lineLimit(1)
+//                .frame(minWidth: 80, maxWidth: .infinity, alignment: rightAligned ? .trailing : .leading)
+//                .padding(.horizontal, 6)
+//        }
+////        .frame(maxWidth: .infinity, alignment: rightAligned ? .trailing : .leading)
+//    }
+    
     private func teamCell(teamId: Int?, fallback: String, rightAligned: Bool = false) -> some View {
-        let ab = abbr(teamId)
-        let logoImg = logo(for: teamId)
-        
-        return VStack(spacing: 10) {
-            logoImg
-                .resizable()
-                .scaledToFit()
-                .frame(width: 46, height: 46)
-                .frame(maxWidth: 110, alignment: rightAligned ? .trailing : .leading)
-//                .shadow(color: .white.opacity(1), radius: 0.9, x: 0, y: 0)
+        let team = teamId.flatMap { teams.team($0) }
+        let name = team?.name ?? fallback
 
-            Text(ab.isEmpty ? fallback : ab)
-                .font(.custom("Jost", size: 15).weight(.light))
-        
+        // Pick color using your existing logic
+        let primary = team?.primaryColor
+        let secondary = team?.secondaryColor
+        let opponentId = (teamId == vm.model?.homeId) ? vm.model?.awayId : vm.model?.homeId
+        let opponentPrimary = opponentId.flatMap { teams.team($0)?.primaryColor }
+
+        let color = pickTeamColor(
+            primary: primary,
+            secondary: secondary,
+            opponentPrimary: opponentPrimary
+        )
+
+        return VStack(spacing: 8) {
+
+            // === Colored Bar (instead of logo) ===
+            Rectangle()
+                .fill(color)
+                .frame(width: 46, height: 6)
+                .cornerRadius(3)
+                .frame(maxWidth: 110,
+                       alignment: rightAligned ? .trailing : .leading)
+
+            // === Team Name ===
+            Text(name)
+                .font(.custom("Jost-SemiBold", size: 15))
                 .foregroundColor(.primary)
                 .lineLimit(1)
-                .frame(minWidth: 80, maxWidth: .infinity, alignment: rightAligned ? .trailing : .leading)
+                .minimumScaleFactor(0.7)
+                .frame(minWidth: 80,
+                       maxWidth: .infinity,
+                       alignment: rightAligned ? .trailing : .leading)
                 .padding(.horizontal, 6)
         }
-//        .frame(maxWidth: .infinity, alignment: rightAligned ? .trailing : .leading)
     }
+    
+    private func teamRow(teamId: Int?, fallback: String) -> some View {
+        let team = teamId.flatMap { teams.team($0) }
+        let name = team?.name ?? fallback
+
+        // pick primary color
+        let primary = team?.primaryColor
+        let secondary = team?.secondaryColor
+        let opponentId = (teamId == vm.model?.homeId) ? vm.model?.awayId : vm.model?.homeId
+        let opponentPrimary = opponentId.flatMap { teams.team($0)?.primaryColor }
+
+        let color = pickTeamColor(
+            primary: primary,
+            secondary: secondary,
+            opponentPrimary: opponentPrimary
+        )
+
+        return HStack(spacing: 8) {
+            Circle()
+                .fill(color)
+                .frame(width: 10, height: 10)
+
+            Text(name)
+                .font(.custom("Jost-SemiBold", size: 16))
+                .foregroundColor(.primary)
+                .lineLimit(1)
+        }
+    }
+
+
     
     private func abbr(_ teamId: Int?) -> String {
         guard let id = teamId else { return "" }
@@ -253,5 +330,5 @@ struct ProbBar: View {
 }
 
 #Preview {
-    MatchCard(gameId: 178)
+    MatchCard(gameId: 289)
 }

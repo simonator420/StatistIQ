@@ -30,6 +30,9 @@ final class TeamsDirectory: ObservableObject {
                 let code = data["code"] as? String ?? ""
                 let logo = data["logo"] as? String
                 
+                let primaryColor = data["primaryColor"] as? String
+                let secondaryColor = data["secondaryColor"] as? String
+                
                 map[id] = FirebaseTeam(id: id,
                                        name: name,
                                        code: code,
@@ -38,7 +41,9 @@ final class TeamsDirectory: ObservableObject {
                                        abbreviation: abbreviation,
                                        nba_team: nbaTeam,
                                        arena: arena,
-                                       city: city
+                                       city: city,
+                                       primaryColor: primaryColor,
+                                       secondaryColor: secondaryColor
                 )
             }
             DispatchQueue.main.async {

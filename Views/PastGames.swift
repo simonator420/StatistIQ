@@ -7,11 +7,12 @@ struct PastGameCard: View {
     var awayScore: String
     var date: String
     var venue: String
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white)
+                .fill(Color(colorScheme == .light ? Color.white : Color(.systemGray6)))
                 .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
                 .frame(height: 115)
                 .padding(.horizontal, 16)
@@ -29,21 +30,21 @@ struct PastGameCard: View {
                         
                         Text(homeScore)
                             .font(.custom("Jost", size: 28).weight(.medium))
-                            .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                            .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                             .monospacedDigit()
                             .frame(width: homeScore.count == 3 ? 75 : 55, alignment: .trailing)
                     }
                     
                     Text("–")
                         .font(.custom("Jost", size: 28).weight(.medium))
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                         .padding(.horizontal, 15)
                     
                     // Away team (score + logo)
                     HStack(spacing: 2) {
                         Text(awayScore)
                             .font(.custom("Jost", size: 28).weight(.medium))
-                            .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                            .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                             .monospacedDigit()
                             .frame(width: awayScore.count == 3 ? 75 : 55, alignment: .leading)
                         
@@ -59,7 +60,7 @@ struct PastGameCard: View {
                 VStack(spacing: 6) {
                     Text(date)
                         .font(.custom("Jost", size: 16).weight(.medium))
-                        .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                        .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                     
 //                    Text(venue)
 //                        .font(.custom("Jost", size: 16).weight(.medium))

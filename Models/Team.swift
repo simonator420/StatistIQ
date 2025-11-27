@@ -18,4 +18,6 @@ struct FirebaseTeam: Identifiable, Codable {
     let nba_team: Bool
     let arena: String?
     let city: String?
+    let primaryColor: String?
+    let secondaryColor: String?
 }
