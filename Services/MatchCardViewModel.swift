@@ -47,18 +47,24 @@ final class MatchCardViewModel: ObservableObject {
                 // Parse predictions
                 if let predictions = data["predictions"] as? [String: Any] {
                     let win = predictions["winProbability"] as? [String: Any]
-                    let em  = predictions["expectedMargin"] as? Double
 
                     let winHome = win?["home"] as? Double
                     let winAway = win?["away"] as? Double
 
-                    // Merge into existing model
-                    if var current = self?.model {
-                        current.winHome = winHome
-                        current.winAway = winAway
-                        current.marginValue = em
-                        current.marginFavTeamId = nil
-                        self?.model = current
+                    if let em = predictions["expectedMargin"] as? [String: Any] {
+
+                        let fav = em["teamId"] as? NSNumber
+                        let marginFavTeamId = fav?.intValue ?? em["teamId"] as? Int
+
+                        let marginValue = (em["value"] as? NSNumber)?.doubleValue ?? em["value"] as? Double
+
+                        if var current = self?.model {
+                            current.winHome = winHome
+                            current.winAway = winAway
+                            current.marginValue = marginValue
+                            current.marginFavTeamId = marginFavTeamId
+                            self?.model = current
+                        }
                     }
                 }
             }

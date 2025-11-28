@@ -56,7 +56,7 @@ struct MatchDetailView: View {
                             .font(.custom("Jost", size: 15).weight(.medium))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
-                            .padding(.top, -30)
+                            .padding(.top, -25.5)
                             .padding(.bottom, 35)
                             
                             // Teams and Logos
@@ -204,7 +204,6 @@ struct MatchDetailView: View {
         }
     }
     
-    // MARK: - Small helpers
     @ViewBuilder
     private func teamBlock(teamId: Int?, fallback: String, results: [Bool], isFavorite: Bool, onToggle: @escaping () -> Void, record: TeamRecord?, textWidth: Binding<CGFloat>) -> some View {
         let t = teamId.flatMap { teams.team($0) }

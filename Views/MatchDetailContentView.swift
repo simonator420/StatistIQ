@@ -25,7 +25,7 @@ struct MatchDetailContentView: View {
                                         
                                         A higher percentage means the team is more likely to win — but upsets are always possible.
                                         """)
-
+                            
                             HStack(spacing: 120) {
                                 Text(vm.model?.homeWinText ?? "–")
                                 Text(vm.model?.awayWinText ?? "–")
@@ -41,7 +41,7 @@ struct MatchDetailContentView: View {
                         )
                         .cornerRadius(14)
                         .padding(.top, 25)
-                        .padding(.horizontal, 12)
+                        .padding(.horizontal, 16)
                         
                         // Predicted Points Range
                         VStack(spacing: 10) {
@@ -67,7 +67,7 @@ struct MatchDetailContentView: View {
                         )
                         .cornerRadius(14)
                         .padding(.top, 25)
-                        .padding(.horizontal, 12)
+                        .padding(.horizontal, 16)
                         
                         // Expected Margin
                         VStack(spacing: 10) {
@@ -78,10 +78,44 @@ struct MatchDetailContentView: View {
                                                                     
                             A positive margin favors the listed team, while a negative margin would favor their opponent. The larger the margin, the more dominant the expected performance.
                             """)
-                            Text(vm.model?.expectedMarginText(using: teams) ?? "–")
-                                .font(.custom("Jost", size: 28).weight(.medium))
-                                .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
-                                .fixedSize(horizontal: true, vertical: false)
+                            HStack(spacing: 12) {
+                                
+                                // === DOT WITH SAME PICK COLOR LOGIC ===
+                                if let favId = vm.model?.expectedMarginTeamId,
+                                   let favTeam = teams.team(favId)
+                                {
+                                    let primary = favTeam.primaryColor
+                                    let secondary = favTeam.secondaryColor
+                                    
+                                    let opponentId =
+                                    favId == vm.model?.homeId ? vm.model?.awayId : vm.model?.homeId
+                                    let opponentPrimary = opponentId.flatMap { teams.team($0)?.primaryColor }
+                                    
+                                    let pickedColor = pickTeamColor(
+                                        primary: primary,
+                                        secondary: secondary,
+                                        opponentPrimary: opponentPrimary
+                                    )
+                                    
+                                    Circle()
+                                        .fill(pickedColor)
+                                        .frame(width: 14, height: 14)
+                                } else {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.4))
+                                        .frame(width: 14, height: 14)
+                                }
+                                
+                                Text(expectedMargin(vm: vm, teams: teams))
+                                    .font(.custom("Jost", size: 28).weight(.medium))
+                                    .foregroundColor(
+                                        colorScheme == .light
+                                        ? Color(red: 0.12, green: 0.16, blue: 0.27)
+                                        : Color.white
+                                    )
+                                    .minimumScaleFactor(0.5)
+                                    .lineLimit(1)
+                            }
                         }
                         .padding(10)
                         .frame(maxWidth: .infinity)
@@ -91,7 +125,7 @@ struct MatchDetailContentView: View {
                         )
                         .cornerRadius(14)
                         .padding(.top, 25)
-                        .padding(.horizontal, 12)
+                        .padding(.horizontal, 16)
                         
                         VStack(spacing: 10) {
                             headerWithInfo("Overtime Probability", text: """
@@ -113,7 +147,7 @@ struct MatchDetailContentView: View {
                         )
                         .cornerRadius(14)
                         .padding(.top, 25)
-                        .padding(.horizontal, 12)
+                        .padding(.horizontal, 16)
                         
                         // Key Players – keep your placeholder or wire up later
                     }
@@ -148,7 +182,21 @@ struct MatchDetailContentView: View {
         }
     }
     
-    // MARK: - Local helpers (copied to keep behavior 1:1)
+    func expectedMargin(vm: MatchDetailViewModel, teams: TeamsDirectory) -> String {
+        guard
+            let value = vm.model?.expectedMarginValue,
+            let favId = vm.model?.expectedMarginTeamId,
+            let teamName = teams.team(favId)?.name
+        else { return "–" }
+        
+        let positive = abs(value)
+        
+        let formatted = positive.truncatingRemainder(dividingBy: 1) == 0
+        ? String(Int(positive))
+        : String(format: "%.1f", positive)
+        
+        return "+\(formatted) \(teamName)"
+    }
     
     private func headerWithInfo(_ title: String, text: String) -> some View {
         HStack(spacing: 4) {
@@ -165,7 +213,7 @@ struct MatchDetailContentView: View {
                     .foregroundColor(.gray)
             }
         }
-//        .padding(.top, 25.0)
+        //        .padding(.top, 25.0)
     }
 }
 

@@ -300,6 +300,8 @@ def predict_games(request):
         ot_prob = models["ot"].predict_proba(
             scalers["ot"].transform(features_ot)
         )[0, 1]
+        
+        fav_team_id = home_firebase_id if margin >= 0 else away_firebase_id
 
         # save back to Firestore
         db.collection("games_schedule").document(game_id).update({
@@ -309,7 +311,10 @@ def predict_games(request):
                     "home": {"min": float(home_pts - 10), "max": float(home_pts + 10)},
                     "away": {"min": float(away_pts - 10), "max": float(away_pts + 10)},
                 },
-                "expectedMargin": float(abs(margin)),
+                "expectedMargin": {
+                    "teamId": fav_team_id,
+                    "value": float(abs(margin))
+                },
                 "overtimeProbability": float(ot_prob),
             },
             "home_record": home_record,

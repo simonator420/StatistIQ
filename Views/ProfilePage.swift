@@ -213,11 +213,7 @@ struct ProfilePage: View {
                                     
                                     ForEach(Array(favs), id: \.self) { tid in
                                         HStack(spacing: 10) {
-                                            teamLogo(for: tid)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 24, height: 24)
-                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            teamColorDot(for: tid)
                                             
                                             Text(teamName(for: tid))
                                                 .font(.custom("Jost", size: 14))
@@ -308,4 +304,16 @@ struct ProfilePage: View {
             return Image(systemName: "shield.lefthalf.filled")
         }
     }
+    private func teamColorDot(for id: Int) -> some View {
+        let team = TeamsDirectory.shared.team(id)
+        let primary = team?.primaryColor
+        let secondary = team?.secondaryColor
+
+        let picked = pickTeamColor(primary: primary, secondary: secondary, opponentPrimary: nil)
+
+        return Circle()
+            .fill(picked)
+            .frame(width: 16, height: 16)
+    }
+
 }

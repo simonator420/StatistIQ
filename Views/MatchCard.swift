@@ -22,8 +22,8 @@ struct MatchCard: View {
                 .padding(.horizontal, 12)
             
             if let m = vm.model {
-                let home = m.winHome ?? 0     // 0…1
-                let away = m.winAway ?? 0     // 0…1
+                let home = m.winHome ?? 0
+                let away = m.winAway ?? 0
                 
                 VStack(spacing: 8) {
                     // HEADER — time · venue
@@ -297,7 +297,7 @@ struct MatchCard: View {
         let h = max(0, min(1, home))
         let a = max(0, min(1, away))
         let diff = abs(h - a)
-        guard diff >= 0.01 else { return nil } // zobraz jen pokud rozdíl ≥ 5 p.b.
+        guard diff >= 0.01 else { return nil }
         let pts = Int((diff * 100).rounded())
         return h > a ? "+\(pts) \(homeCode)" : "+\(pts) \(awayCode)"
     }
