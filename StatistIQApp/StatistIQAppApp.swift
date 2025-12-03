@@ -2,6 +2,7 @@ import SwiftUI
 import FirebaseCore
 import GoogleSignIn
 import FBSDKCoreKit
+import GoogleMobileAds
 
 // AppDelegate to configure Firebase
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -14,6 +15,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
+        
+        MobileAds.shared.start(completionHandler: nil)
         
         return true
     }

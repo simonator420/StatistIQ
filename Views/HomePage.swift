@@ -67,8 +67,6 @@ struct Homepage: View {
                     
                     
                     adBanner()
-                        .padding(.bottom, 35)
-                    
                     
                 }
             }
@@ -80,6 +78,37 @@ struct Homepage: View {
                     .ignoresSafeArea(edges: .bottom),
                 alignment: .bottom
             )
+            
+            // Offline overlay
+            .overlay(
+                Group {
+                    if !net.isConnected {
+                        VStack(spacing: 12) {
+                            Image(systemName: "wifi.exclamationmark")
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundColor(.white)
+
+                            Text("No internet connection")
+                                .font(.custom("Jost", size: 17).weight(.semibold))
+                                .foregroundColor(.white)
+
+                            Text("Please check your network settings.")
+                                .font(.custom("Jost", size: 14))
+                                .foregroundColor(.white.opacity(0.9))
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.red.opacity(0.9))
+                        .cornerRadius(10)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 10)
+                        .transition(.opacity)
+                        .zIndex(5)
+                    }
+                },
+                alignment: .top
+            )
+
             
             // Overlay for league selection screen
             .overlay(
@@ -168,18 +197,18 @@ struct Homepage: View {
     }
     
     
-    func adBanner() -> some View {
-        Rectangle()
-            .fill(Color.gray)
-            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
-            .frame(height: 60)
-        //            .padding(.horizontal, 16)
-            .overlay(
-                Text("Ad Banner")
-                    .foregroundColor(.black) // Text color
-                    .font(.custom("Jost-Medium", size: 16))
-            )
-    }
+//    func adBanner() -> some View {
+//        Rectangle()
+//            .fill(Color.gray)
+//            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
+//            .frame(height: 60)
+//        //            .padding(.horizontal, 16)
+//            .overlay(
+//                Text("Ad Banner")
+//                    .foregroundColor(.black) // Text color
+//                    .font(.custom("Jost-Medium", size: 16))
+//            )
+//    }
     
     func formattedJoinDate(from timestamp: Timestamp?) -> String {
         guard let timestamp = timestamp else { return "" }
@@ -188,6 +217,12 @@ struct Homepage: View {
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         return "Joined on \(formatter.string(from: date))"
+    }
+    
+    func adBanner() -> some View {
+        BannerAdView(adUnitID: "ca-app-pub-6108216778743846/4562365415")
+            .frame(height: 50)
+            .padding(.bottom, 48)
     }
 }
 

@@ -52,16 +52,16 @@ struct SettingsView: View {
                             }
                         }
                         
-                        Divider()
-                        // TODO: Change links on whole page to point at correct link
-                        settingsRow(icon: "star.fill", title: "Rate us") {
-                            if let url =
-                                //URL(string: "itms-apps://itunes.apple.com/app/idYOUR_APP_ID?action=write-review"),
-                                URL(string: "https://apple.com"),
-                               UIApplication.shared.canOpenURL(url) {
-                                UIApplication.shared.open(url)
-                            }
-                        }
+//                        Divider()
+//                        // TODO: Change links on whole page to point at correct link
+//                        settingsRow(icon: "star.fill", title: "Rate us") {
+//                            if let url =
+//                                //URL(string: "itms-apps://itunes.apple.com/app/idYOUR_APP_ID?action=write-review"),
+//                                URL(string: "https://simonator420.github.io/statistiq-legal/about.html"),
+//                               UIApplication.shared.canOpenURL(url) {
+//                                UIApplication.shared.open(url)
+//                            }
+//                        }
                         
                         Divider()
                         
@@ -69,8 +69,8 @@ struct SettingsView: View {
                         
                         Divider()
                         
-                        settingsRow(icon: "doc.text", title: "Terms & Conditions") {
-                            if let url = URL(string: "https://simonsalaj.com/statistiq/terms-and-condition"),
+                        settingsRow(icon: "doc.text", title: "Terms of Use") {
+                            if let url = URL(string: "https://simonator420.github.io/statistiq-legal/terms.html"),
                                UIApplication.shared.canOpenURL(url) {
                                 UIApplication.shared.open(url)
                             }
@@ -79,7 +79,7 @@ struct SettingsView: View {
                         Divider()
                         
                         settingsRow(icon: "lock.doc", title: "Privacy Policy") {
-                            if let url = URL(string: "https://simonsalaj.com/statistiq/privacy-policy"),
+                            if let url = URL(string: "https://simonator420.github.io/statistiq-legal/privacy.html"),
                                UIApplication.shared.canOpenURL(url) {
                                 UIApplication.shared.open(url)
                             }
@@ -88,7 +88,7 @@ struct SettingsView: View {
                         Divider()
                         
                         settingsRow(icon: "info.circle", title: "About Us") {
-                            if let url = URL(string: "https://simonsalaj.com/statistiq/about"),
+                            if let url = URL(string: "https://simonsalaj.com/#about"),
                                UIApplication.shared.canOpenURL(url) {
                                 UIApplication.shared.open(url)
                             }

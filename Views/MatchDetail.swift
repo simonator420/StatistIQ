@@ -236,7 +236,7 @@ struct MatchDetailView: View {
                 
                 if let id = teamId, let abbrev = teams.team(id)?.code {
                     Text(abbrev)
-                        .font(.custom("Jost-Bold", size: 34))
+                        .font(.custom("Jost", size: 34).weight(.medium))
                         .foregroundColor(.white)
                         .background(
                             GeometryReader { geo in

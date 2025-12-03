@@ -190,7 +190,6 @@ struct MatchCard: View {
 
         return VStack(spacing: 8) {
 
-            // === Colored Bar (instead of logo) ===
             Rectangle()
                 .fill(color)
                 .frame(width: 46, height: 6)
@@ -198,7 +197,6 @@ struct MatchCard: View {
                 .frame(maxWidth: 110,
                        alignment: rightAligned ? .trailing : .leading)
 
-            // === Team Name ===
             Text(name)
                 .font(.custom("Jost-SemiBold", size: 15))
                 .foregroundColor(.primary)
@@ -300,6 +298,44 @@ struct MatchCard: View {
         guard diff >= 0.01 else { return nil }
         let pts = Int((diff * 100).rounded())
         return h > a ? "+\(pts) \(homeCode)" : "+\(pts) \(awayCode)"
+    }
+    
+    func ensureVisibleColor(
+        picked: Color,
+        primaryHex: String?,
+        secondaryHex: String?,
+        scheme: ColorScheme
+    ) -> Color {
+        let primary = Color(hex: primaryHex)
+        let secondary = Color(hex: secondaryHex)
+
+        // Simple brightness calculation
+        func brightness(_ color: Color?) -> CGFloat {
+            guard let color else { return 1 }
+            let ui = UIColor(color)
+            var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+            ui.getRed(&r, green: &g, blue: &b, alpha: &a)
+            return (r + g + b) / 3
+        }
+
+        let p = brightness(primary)
+
+        // THRESHOLDS:
+        let tooWhite: CGFloat = 0.85   // very bright → invisible in light mode
+        let tooBlack: CGFloat = 0.20   // very dark → invisible in dark mode
+
+        // 1) If primary is too white and we're in light mode → use secondary
+        if scheme == .light, p > tooWhite {
+            return secondary ?? primary!
+        }
+
+        // 2) If primary is too black and we're in dark mode → use secondary
+        if scheme == .dark, p < tooBlack {
+            return secondary ?? primary!
+        }
+
+        // Otherwise primary is fine
+        return primary!
     }
 }
 

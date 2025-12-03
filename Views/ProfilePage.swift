@@ -258,7 +258,7 @@ struct ProfilePage: View {
                                     .padding(.bottom, 7)
                                 
                                 
-                                ShareLink(item: URL(string: "https://apple.com")! ){
+                                ShareLink(item: URL(string: "https://simonator420.github.io/statistiq-legal/about.html")! ){
                                     Label("Share link", systemImage: "square.and.arrow.up")
                                         .font(.custom("Jost", size: 14).weight(.medium))
                                         .padding(.horizontal, 16)

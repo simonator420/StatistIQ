@@ -383,12 +383,12 @@ struct SignInView: View {
         
         if let privacyRange = fullText.range(of: "Privacy Policy") {
             fullText[privacyRange].foregroundColor = linkColor
-            fullText[privacyRange].link = URL(string: "https://privacy-policy-url.com")!
+            fullText[privacyRange].link = URL(string: "https://simonator420.github.io/statistiq-legal/privacy.html")!
         }
         
         if let termsRange = fullText.range(of: "Terms of Use") {
             fullText[termsRange].foregroundColor = linkColor
-            fullText[termsRange].link = URL(string: "https://terms-url.com")!
+            fullText[termsRange].link = URL(string: "https://simonator420.github.io/statistiq-legal/terms.html")!
         }
         
         return fullText
