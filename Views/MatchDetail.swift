@@ -56,7 +56,7 @@ struct MatchDetailView: View {
                             .font(.custom("Jost", size: 15).weight(.medium))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
-                            .padding(.top, -25.5)
+                            .padding(.top, -25)
                             .padding(.bottom, 35)
                             
                             // Teams and Logos
@@ -148,7 +148,7 @@ struct MatchDetailView: View {
                         teams: teams,
                         selectedTab: $selectedTab,
                         showInfoSheet: $showInfoSheet,
-                        infoText: $infoText
+                        infoText: $infoText,
                     )
                 }
                 .overlay(
@@ -232,7 +232,7 @@ struct MatchDetailView: View {
             VStack(spacing: -8) {
                 Rectangle()
                     .fill(chosenColor)
-                    .frame(width: textWidth.wrappedValue, height: 3.5)
+                    .frame(width: textWidth.wrappedValue, height: 4)
                 
                 if let id = teamId, let abbrev = teams.team(id)?.code {
                     Text(abbrev)
@@ -418,5 +418,5 @@ func pickTeamColor(
 
 
 #Preview {
-    MatchDetailView(gameId:279)
+    MatchDetailView(gameId:316)
 }

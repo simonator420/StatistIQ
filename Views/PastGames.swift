@@ -1,18 +1,24 @@
 import SwiftUI
 
 struct PastGameCard: View {
-    var homeLogo: String
-    var awayLogo: String
+    var homePrimaryColor: Color
+    var awayPrimaryColor: Color
+    var homeId: Int
+    var awayId: Int
+    var homeAbbr: String
+    var awayAbbr: String
     var homeScore: String
     var awayScore: String
     var date: String
     var venue: String
+    
+    @EnvironmentObject var teams: TeamsDirectory
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(colorScheme == .light ? Color.white : Color(.systemGray6)))
+                .fill(Color(colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemGray6)))
                 .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
                 .frame(height: 115)
                 .padding(.horizontal, 16)
@@ -22,37 +28,45 @@ struct PastGameCard: View {
                 HStack(spacing: 0) {
                     // Home team (logo + score)
                     HStack(spacing: 2) {
-                        Image(homeLogo)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 45, height: 45)
-                            .padding(.leading, homeScore.count == 3 ? 0 : 20)
-                        
+                        VStack(spacing:1){
+                            Text(homeAbbr)
+                                .font(.custom("Jost", size: 26).weight(homeWon ? .bold : .light))
+                                .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
+                                .frame(width: 65)
+                            
+                            Rectangle()
+                                .fill(homePrimaryColor)
+                                .frame(width: 30, height: 3)
+                        }
                         Text(homeScore)
-                            .font(.custom("Jost", size: 28).weight(.medium))
+                            .font(.custom("Jost", size: 26).weight(homeWon ? .bold : .light))
                             .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                             .monospacedDigit()
-                            .frame(width: homeScore.count == 3 ? 75 : 55, alignment: .trailing)
+                            .frame(width: homeScore.count == 3 ? 65 : 55, alignment: .trailing)
                     }
                     
                     Text("–")
-                        .font(.custom("Jost", size: 28).weight(.medium))
+                        .font(.custom("Jost", size: 26).weight(.light))
                         .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                         .padding(.horizontal, 15)
                     
                     // Away team (score + logo)
                     HStack(spacing: 2) {
                         Text(awayScore)
-                            .font(.custom("Jost", size: 28).weight(.medium))
+                            .font(.custom("Jost", size: 26).weight(awayWon ? .bold : .light))
                             .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                             .monospacedDigit()
-                            .frame(width: awayScore.count == 3 ? 75 : 55, alignment: .leading)
-                        
-                        Image(awayLogo)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 45, height: 45)
-                            .padding(.trailing, awayScore.count == 3 ? 0 : 20)
+                            .frame(width: awayScore.count == 3 ? 65 : 55, alignment: .leading)
+                        VStack(spacing:1){
+                            Text(awayAbbr)
+                                .font(.custom("Jost", size: 26).weight(awayWon ? .bold : .medium))
+                                .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
+                                .frame(width: 65)
+                            
+                            Rectangle()
+                                .fill(awayPrimaryColor)
+                                .frame(width: 30, height: 3)
+                        }
                     }
                 }
                 
@@ -62,12 +76,25 @@ struct PastGameCard: View {
                         .font(.custom("Jost", size: 16).weight(.medium))
                         .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
                     
-//                    Text(venue)
-//                        .font(.custom("Jost", size: 16).weight(.medium))
-//                        .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                    //                    Text(venue)
+                    //                        .font(.custom("Jost", size: 16).weight(.medium))
+                    //                        .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
                 }
             }
         }
+    }
+    private var mainTextColor: Color {
+        colorScheme == .light
+        ? Color(red: 0.12, green: 0.16, blue: 0.27)
+        : Color.white
+    }
+    
+    private var homeWon: Bool {
+        (Int(homeScore) ?? 0) > (Int(awayScore) ?? 0)
+    }
+
+    private var awayWon: Bool {
+        (Int(awayScore) ?? 0) > (Int(homeScore) ?? 0)
     }
 }
 
@@ -75,8 +102,12 @@ struct PastGameCard: View {
     VStack(spacing: 20) {
         // Test with different score lengths
         PastGameCard(
-            homeLogo: "134",
-            awayLogo: "135",
+            homePrimaryColor: Color(.red),
+            awayPrimaryColor: Color(.blue),
+            homeId: 145,
+            awayId: 149,
+            homeAbbr: "PHX",
+            awayAbbr: "GSW",
             homeScore: "102",
             awayScore: "199",
             date: "21/02/2025",
@@ -84,8 +115,12 @@ struct PastGameCard: View {
         )
         
         PastGameCard(
-            homeLogo: "134",
-            awayLogo: "135",
+            homePrimaryColor: Color(.red),
+            awayPrimaryColor: Color(.blue),
+            homeId: 145,
+            awayId: 149,
+            homeAbbr: "134",
+            awayAbbr: "135",
             homeScore: "98",
             awayScore: "127",
             date: "20/02/2025",
@@ -93,8 +128,12 @@ struct PastGameCard: View {
         )
         
         PastGameCard(
-            homeLogo: "141",
-            awayLogo: "145",
+            homePrimaryColor: Color(.red),
+            awayPrimaryColor: Color(.blue),
+            homeId: 145,
+            awayId: 149,
+            homeAbbr: "141",
+            awayAbbr: "145",
             homeScore: "101",
             awayScore: "92",
             date: "19/02/2025",
@@ -102,4 +141,5 @@ struct PastGameCard: View {
         )
     }
     .padding()
+    .environmentObject(TeamsDirectory.shared)
 }
