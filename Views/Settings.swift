@@ -118,16 +118,6 @@ struct SettingsView: View {
                                 showDeleteConfirmation = true
                             }
                         }
-                        NavigationLink(
-                            destination: EditProfile(
-                                initialUsername: "",                 // EditProfile loads the real name onAppear
-                                onSaved: { updated in
-                                    onUsernameChanged?(updated)      // bubble up to parent if needed
-                                }
-                            ),
-                            isActive: $showEditProfile
-                        ) { EmptyView() }.hidden()
-
                     }
                     .background(colorScheme == .light ? Color.white : Color.black)
                     .cornerRadius(12)
@@ -136,6 +126,15 @@ struct SettingsView: View {
                 }
             }
         }
+        .navigationDestination(isPresented: $showEditProfile) {
+            EditProfile(
+                initialUsername: "",
+                onSaved: { updated in
+                    onUsernameChanged?(updated)
+                }
+            )
+        }
+
         .overlay(
             Group {
                 if showLogoutMessage {

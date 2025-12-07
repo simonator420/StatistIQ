@@ -41,7 +41,8 @@ struct MatchCard: View {
                         if let homeId = m.homeId,
                                let arena = teams.arena(for: homeId),
                                let city = teams.city(for: homeId) {
-                                Text("\(venueShort("\(arena), \(city)"))")
+//                                Text("\(venueShort("\(arena), \(city)"))")
+                                Text("\(arena), \(city)")
                                     .font(.custom("Jost", size: 13))
                                     .foregroundColor(.secondary)
                                     .lineLimit(1)
@@ -286,8 +287,8 @@ struct MatchCard: View {
             let ab = h > a ? homeCode : awayCode
             let absVal = abs(val)
             let number = absVal.truncatingRemainder(dividingBy: 1) == 0
-            ? String(Int(absVal))
-            : String(format: "%.1f", absVal)
+            ? String(Int(absVal.rounded(.up)))
+            : String(format: "%.0f", absVal.rounded(.up))
             let sign = val >= 0 ? "+" : "−"
             return "\(sign)\(number) \(ab)"
         }

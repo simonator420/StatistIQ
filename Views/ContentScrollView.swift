@@ -619,8 +619,12 @@ struct ContentScrollView: View {
             scheduleStore.start()
             if isLoggedIn { favoritesStore.start() }
         }
-        .onChange(of: isLoggedIn) { loggedIn in
-            if loggedIn { favoritesStore.start() } else { favoritesStore.stop() }
+        .onChange(of: isLoggedIn) {
+            if isLoggedIn {
+                favoritesStore.start()
+            } else {
+                favoritesStore.stop()
+            }
         }
     }
     

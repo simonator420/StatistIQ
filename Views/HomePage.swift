@@ -53,6 +53,7 @@ struct Homepage: View {
                         .opacity(selectedTab == "favorites" ? 1 : 0)
                                 .allowsHitTesting(selectedTab == "favorites")
 //                                .animation(.easeInOut(duration: 0.22), value: selectedTab)
+
                         ProfilePage(
                             selectedTab: $selectedTab,
                             isLoggedIn: $isLoggedIn,

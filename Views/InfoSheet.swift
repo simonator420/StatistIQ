@@ -24,7 +24,7 @@ struct InfoSheet: View {
                 
                 // Info Text
                 Text(infoText)
-                    .font(.custom("Jost", size: 16))
+                    .font(.custom("Jost", size: 16).weight(.light))
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.leading)
                     .padding(.horizontal, 35.0)

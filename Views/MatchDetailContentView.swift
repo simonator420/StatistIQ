@@ -26,10 +26,8 @@ struct MatchDetailContentView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            .onChange(of: selectedTab) { _ in
-                
-                    proxy.scrollTo("top", anchor: .top)
-                
+            .onChange(of: selectedTab) {
+                proxy.scrollTo("top", anchor: .top)
             }
         }
     }
@@ -51,7 +49,11 @@ private extension MatchDetailContentView {
     var winProbabilityCard: some View {
         infoCard {
             headerWithInfo("Win Probability", text: """
-                Win Probability represents the chance each team has to win the game.
+                Win Probability represents the chance each team has to win the game, based on factors like recent form, player performance, injuries, and historical matchups.
+                                                        
+                It's calculated using AI models trained on real game data and updated for every matchup.
+                
+                A higher percentage means the team is more likely to win — but upsets are always possible.
                 """)
             HStack(spacing: 120) {
                 Text(vm.model?.homeWinText ?? "–")
@@ -66,7 +68,11 @@ private extension MatchDetailContentView {
     var predictedRangeCard: some View {
         infoCard {
             headerWithInfo("Predicted Points Range", text: """
-                Predicted Points Range shows the expected scoring interval for each team.
+                Predicted Points Range shows the expected scoring interval for each team based on statistical models.
+                                                        
+                These predictions take into account factors such as offensive and defensive efficiency, pace of play, player availability, and historical matchups.
+                
+                The actual score may vary, but this range provides an estimate of where the final points are most likely to fall.
                 """)
             HStack(spacing: 70) {
                 Text(vm.model?.homeRangeText ?? "–")
@@ -81,16 +87,31 @@ private extension MatchDetailContentView {
     var expectedMarginCard: some View {
         infoCard {
             headerWithInfo("Expected Margin of Victory", text: """
-                Expected Margin of Victory indicates the predicted point difference.
+                Expected Margin of Victory indicates how many points a team is predicted to win by, on average, according to the model.
+                                            
+                It is calculated using factors like team strength, recent performance, player matchups, and game location.
+                                                        
+                A positive margin favors the listed team, while a negative margin would favor their opponent. The larger the margin, the more dominant the expected performance.
                 """)
 
-            HStack(spacing: 12) {
-                expectedMarginDot
-                Text(expectedMarginText)
-                    .font(.custom("Jost", size: 28).weight(.medium))
-                    .foregroundColor(mainTextColor)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+            if let m = vm.model {
+                let fav = expectedMarginLabel(
+                    home: m.winHome ?? 0,
+                    away: m.winAway ?? 0,
+                    homeCode: m.homeId.flatMap { teams.team($0)?.name } ?? "",
+                    awayCode: m.awayId.flatMap { teams.team($0)?.name } ?? "",
+                    marginFavTeamId: m.expectedMarginTeamId,
+                    marginValue: m.expectedMarginValue
+                )
+
+                HStack(spacing: 12) {
+                    expectedMarginDot(for: fav.teamId)
+                    Text(fav.text ?? "–")
+                        .font(.custom("Jost", size: 28).weight(.medium))
+                        .foregroundColor(mainTextColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
             }
         }
     }
@@ -99,7 +120,11 @@ private extension MatchDetailContentView {
     var overtimeCard: some View {
         infoCard {
             headerWithInfo("Overtime Probability", text: """
-                Chance the game reaches overtime.
+                Overtime Probability shows the chance the game is tied after regulation.
+                                                
+                It’s derived from our predicted score-margin distribution.
+                
+                A higher value means a tighter matchup; overtime is rare, so most games are in the low single digits.
                 """)
             Text(vm.model?.overtimeProbabilityText(using: teams) ?? "–")
                 .font(.custom("Jost", size: 28).weight(.medium))
@@ -148,14 +173,14 @@ private extension MatchDetailContentView {
                 primary: homePrimaryHex,
                 secondary: homeSecondaryHex,
                 opponentPrimary: awayPrimaryHex
-            ) ?? Color.gray.opacity(0.3)
+            )
 
         let awayColor =
             pickTeamColor(
                 primary: awayPrimaryHexOpp,
                 secondary: awaySecondaryHex,
                 opponentPrimary: homePrimaryHexOpp
-            ) ?? Color.gray.opacity(0.3)
+            )
 
         PastGameCard(
             homePrimaryColor: homeColor,
@@ -228,25 +253,64 @@ private extension MatchDetailContentView {
         return "+\(formatted) \(teamName)"
     }
 
-    var expectedMarginDot: some View {
-        let color: Color? = {
-            guard
-                let favId = vm.model?.expectedMarginTeamId,
-                let favTeam = teams.team(favId)
-            else { return nil }
+    private func expectedMarginDot(for teamId: Int?) -> some View {
+        guard
+            let tid = teamId,
+            let t = teams.team(tid)
+        else {
+            return Circle()
+                .fill(Color.gray.opacity(0.4))
+                .frame(width: 14, height: 14)
+        }
 
-            let primary = favTeam.primaryColor
-            let secondary = favTeam.secondaryColor
+        let opponentId = tid == vm.model?.homeId ? vm.model?.awayId : vm.model?.homeId
+        let opponentPrimary = opponentId.flatMap { teams.team($0)?.primaryColor }
 
-            let opponentId = favId == vm.model?.homeId ? vm.model?.awayId : vm.model?.homeId
-            let opponentPrimary = opponentId.flatMap { teams.team($0)?.primaryColor }
-
-            return pickTeamColor(primary: primary, secondary: secondary, opponentPrimary: opponentPrimary)
-        }()
+        let color = pickTeamColor(
+            primary: t.primaryColor,
+            secondary: t.secondaryColor,
+            opponentPrimary: opponentPrimary
+        )
 
         return Circle()
-            .fill(color ?? Color.gray.opacity(0.4))
+            .fill(color)
             .frame(width: 14, height: 14)
+    }
+    
+    private func expectedMarginLabel(
+        home: Double,
+        away: Double,
+        homeCode: String,
+        awayCode: String,
+        marginFavTeamId: Int?,
+        marginValue: Double?
+    ) -> (teamId: Int?, text: String?) {
+        
+        // 1 — If marginValue exists → use same logic as MatchCard
+        if let val = marginValue {
+            let ab = val >= 0 ? homeCode : awayCode
+            let team = val >= 0 ? vm.model?.homeId : vm.model?.awayId
+            
+            let absVal = abs(val)
+            let number = absVal.truncatingRemainder(dividingBy: 1) == 0
+            ? String(Int(absVal.rounded(.up)))
+            : String(format: "%.0f", absVal.rounded(.up))
+            
+            let sign = val >= 0 ? "+" : "−"
+            return (team, "\(sign)\(number) \(ab)")
+        }
+        
+        // 2 — Otherwise fallback to win-probability favorite (MatchCard behavior)
+        let h = max(0, min(1, home))
+        let a = max(0, min(1, away))
+        guard h != a else { return (nil, nil) }
+        
+        let favIsHome = h > a
+        let pts = Int((abs(h - a) * 100).rounded())
+        return (
+            favIsHome ? vm.model?.homeId : vm.model?.awayId,
+            favIsHome ? "+\(pts) \(homeCode)" : "+\(pts) \(awayCode)"
+        )
     }
 }
 

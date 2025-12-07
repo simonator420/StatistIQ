@@ -113,15 +113,6 @@ struct TopBarView: View {
                                         .accessibilityLabel("Edit profile")
                                     }
                                 }
-                                NavigationLink(
-                                    destination: EditProfile(
-                                        initialUsername: currentUser["username"] as? String ?? "",
-                                        onSaved: { updated in
-                                            onUsernameChanged(updated)
-                                        }
-                                    ),
-                                    isActive: $showEditProfile
-                                ) { EmptyView() }.hidden()
                                 
                                 if isLoggedIn {
                                     Text(currentUser["username"] as? String ?? "")
@@ -149,6 +140,15 @@ struct TopBarView: View {
                     .padding(.leading, selectedTab == "profile" ? 0 : 24),
                 alignment: .topLeading
             )
+            .navigationDestination(isPresented: $showEditProfile) {
+                EditProfile(
+                    initialUsername: currentUser["username"] as? String ?? "",
+                    onSaved: { updated in
+                        onUsernameChanged(updated)
+                    }
+                )
+            }
+
     }
     
     // Same formatting helper as in Homepage, kept local for convenience
@@ -159,26 +159,5 @@ struct TopBarView: View {
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         return "Joined on \(formatter.string(from: date))"
-    }
-}
-
-#Preview {
-    @State var selectedTab = "profile"
-    @State var showLeagueSelection = false
-    @State var currentLeague = "NBA"
-    @State var isLoggedIn = true
-    @State var currentUser: [String: Any] = [
-        "username": "simonator420",
-        "createdAt": Timestamp(date: Date())
-    ]
-    
-    return NavigationStack {
-        TopBarView(
-            selectedTab: $selectedTab,
-            showLeagueSelection: $showLeagueSelection,
-            currentLeague: $currentLeague,
-            isLoggedIn: $isLoggedIn,
-            currentUser: $currentUser
-        )
     }
 }

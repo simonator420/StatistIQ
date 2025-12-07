@@ -288,8 +288,12 @@ struct ProfilePage: View {
             .onAppear {
                 if isLoggedIn { favoritesStore.start() }
             }
-            .onChange(of: isLoggedIn) { logged in
-                if logged { favoritesStore.start() } else { favoritesStore.stop() }
+            .onChange(of: isLoggedIn) {
+                if isLoggedIn {
+                    favoritesStore.start()
+                } else {
+                    favoritesStore.stop()
+                }
             }
         }
     }
