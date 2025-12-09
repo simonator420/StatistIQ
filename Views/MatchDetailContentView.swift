@@ -20,7 +20,7 @@ struct MatchDetailContentView: View {
                         .id("top")
                     if selectedTab == "Summary" {
                         summarySection
-                    } else if selectedTab == "Games" {
+                    } else if selectedTab == "Head-to-Head" {
                         gamesSection
                     }
                 }
@@ -36,11 +36,12 @@ struct MatchDetailContentView: View {
 private extension MatchDetailContentView {
     // MARK: - SUMMARY SECTION
     var summarySection: some View {
-        VStack(spacing: 25) {
+        VStack(spacing: 20) {
             winProbabilityCard
             predictedRangeCard
             expectedMarginCard
             overtimeCard
+            predictionSummaryCard
         }
 //        .padding(.top, 25)
     }
@@ -59,7 +60,7 @@ private extension MatchDetailContentView {
                 Text(vm.model?.homeWinText ?? "–")
                 Text(vm.model?.awayWinText ?? "–")
             }
-            .font(.custom("Jost", size: 28).weight(.medium))
+            .font(.custom("Jost", size: 22).weight(.medium))
             .foregroundColor(mainTextColor)
         }
     }
@@ -78,7 +79,7 @@ private extension MatchDetailContentView {
                 Text(vm.model?.homeRangeText ?? "–")
                 Text(vm.model?.awayRangeText ?? "–")
             }
-            .font(.custom("Jost", size: 28).weight(.medium))
+            .font(.custom("Jost", size: 22).weight(.medium))
             .foregroundColor(mainTextColor)
         }
     }
@@ -107,7 +108,7 @@ private extension MatchDetailContentView {
                 HStack(spacing: 12) {
                     expectedMarginDot(for: fav.teamId)
                     Text(fav.text ?? "–")
-                        .font(.custom("Jost", size: 28).weight(.medium))
+                        .font(.custom("Jost", size: 22).weight(.medium))
                         .foregroundColor(mainTextColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
@@ -127,10 +128,15 @@ private extension MatchDetailContentView {
                 A higher value means a tighter matchup; overtime is rare, so most games are in the low single digits.
                 """)
             Text(vm.model?.overtimeProbabilityText(using: teams) ?? "–")
-                .font(.custom("Jost", size: 28).weight(.medium))
+                .font(.custom("Jost", size: 22).weight(.medium))
                 .foregroundColor(mainTextColor)
         }
     }
+    
+    var predictionSummaryCard: some View {
+        predictionSummaryCardView(vm.model?.predictionSummary)
+    }
+
 
     // MARK: - GAMES SECTION
     var gamesSection: some View {
@@ -214,7 +220,7 @@ private extension MatchDetailContentView {
         .frame(maxWidth: .infinity)
         .background(Color(.secondarySystemBackground))
         .cornerRadius(14)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 12)
     }
 
     func headerWithInfo(_ title: String, text: String) -> some View {
@@ -232,6 +238,25 @@ private extension MatchDetailContentView {
                     .foregroundColor(.gray)
             }
         }
+    }
+    
+    func predictionSummaryCardView(_ text: String?) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Match Preview")
+                .font(.custom("Jost", size: 15).weight(.medium))
+                .foregroundColor(.gray)
+
+            Text(text ?? "No preview available.")
+                .font(.custom("Jost", size: 15).weight(.light))
+                .foregroundColor(mainTextColor.opacity(0.75))
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(14)
+        .padding(.horizontal, 16)
     }
 }
 

@@ -2,7 +2,10 @@ functions-framework==3.*
 firebase-admin==6.*
 google-cloud-storage==2.*
 google-cloud-firestore==2.*
+google-cloud-secret-manager==2.*
+openai>=1.40.0
 pandas
 joblib
 scikit-learn
 nba_api
+requests

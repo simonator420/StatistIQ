@@ -14,6 +14,7 @@ struct TopBarView: View {
     
     @State private var rotate: Double = 0
     @State private var showEditProfile: Bool = false
+    @State private var showMatchOnboarding: Bool = false
     
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
@@ -24,36 +25,48 @@ struct TopBarView: View {
             .overlay(
                 Group {
                     if selectedTab == "matches" {
-                        Button {
-                            let spin = reduceMotion ? 0.0 : 0.25
-                            withAnimation(.linear(duration: spin)) {
-                                rotate = (rotate + 180).truncatingRemainder(dividingBy: 360)
+                        HStack(spacing: 12) {
+
+                            // League toggle button (your original button)
+                            Button {
+                                let spin = reduceMotion ? 0.0 : 0.25
+                                withAnimation(.linear(duration: spin)) {
+                                    rotate = (rotate + 180).truncatingRemainder(dividingBy: 360)
+                                }
+
+                                let t = Transaction(animation: nil)
+                                withTransaction(t) {
+                                    currentLeague = (currentLeague == "NBA") ? "Euroleague" : "NBA"
+                                }
+                            } label: {
+                                HStack(spacing: 10) {
+                                    Image("\(currentLeague)_logo".lowercased())
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+
+                                    Text(currentLeague)
+                                        .font(.custom("Jost-SemiBold", size: 22))
+                                        .foregroundColor(.white)
+
+                                    Image(systemName: "arrow.triangle.2.circlepath")
+                                        .font(.system(size: 22, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .rotationEffect(.degrees(rotate))
+                                }
+                                .contentShape(Rectangle())
                             }
                             
-                            let t = Transaction(animation: nil)
-                            withTransaction(t) {
-                                currentLeague = (currentLeague == "NBA") ? "Euroleague" : "NBA"
+                            Spacer()
+                            
+                            // INFO ICON (opens onboarding)
+                            Button {
+                                showMatchOnboarding = true
+                            } label: {
+                                Image(systemName: "info.circle")
+                                    .font(.system(size: 20, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .padding(.trailing, 19)
                             }
-                        } label: {
-                            HStack(spacing: 10) {
-                                // Group logo + name as one semantic chunk
-                                Image("\(currentLeague)_logo".lowercased())
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                
-                                Text(currentLeague)
-                                    .font(.custom("Jost-SemiBold", size: 22))
-                                    .foregroundColor(.white)
-                                    .contentTransition(.identity)
-                                    .animation(nil, value: currentLeague)
-                                
-                                Image(systemName: "arrow.triangle.2.circlepath")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .rotationEffect(.degrees(rotate))
-                                    .accessibilityLabel("Toggle league")
-                            }
-                            .contentShape(Rectangle())               // bigger tap target
                         }
                     } else if selectedTab == "favorites" {
                         Text("Favorites")
@@ -140,6 +153,11 @@ struct TopBarView: View {
                     .padding(.leading, selectedTab == "profile" ? 0 : 24),
                 alignment: .topLeading
             )
+            .fullScreenCover(isPresented: $showMatchOnboarding) {
+                MatchCardOnboardingView {
+                    showMatchOnboarding = false
+                }
+            }
             .navigationDestination(isPresented: $showEditProfile) {
                 EditProfile(
                     initialUsername: currentUser["username"] as? String ?? "",

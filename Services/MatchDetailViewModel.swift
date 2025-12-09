@@ -204,6 +204,8 @@ struct MatchDetailModel {
     let homeRecord: TeamRecord?
     let awayRecord: TeamRecord?
     
+    let predictionSummary: String?
+    
     init(doc: QueryDocumentSnapshot) {
         let data = doc.data()
         id = doc.documentID
@@ -294,6 +296,13 @@ struct MatchDetailModel {
             homeMin = nil; homeMax = nil; awayMin = nil; awayMax = nil
             expectedMarginTeamId = nil; expectedMarginValue = nil; overtimeProbability = nil
         }
+        
+        if let summary = data["summary"] as? [String: Any] {
+            predictionSummary = summary["prediction"] as? String
+        } else {
+            predictionSummary = nil
+        }
+
     }
     
     var homeWinText: String {

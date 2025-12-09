@@ -232,13 +232,12 @@ struct MatchCard: View {
                 .frame(width: 10, height: 10)
 
             Text(name)
-                .font(.custom("Jost-SemiBold", size: 16))
+//                .font(.custom("Jost-SemiBold", size: 16))
+                .font(.custom("Jost", size: 16).weight(.light))
                 .foregroundColor(.primary)
                 .lineLimit(1)
         }
     }
-
-
     
     private func abbr(_ teamId: Int?) -> String {
         guard let id = teamId else { return "" }
@@ -367,5 +366,5 @@ struct ProbBar: View {
 }
 
 #Preview {
-    MatchCard(gameId: 289)
+    MatchCard(gameId: 9001)
 }

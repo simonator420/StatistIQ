@@ -5,6 +5,7 @@ struct InfoSheet: View {
     let onDismiss: () -> Void
     
     @GestureState private var dragOffset: CGFloat = 0
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -31,7 +32,7 @@ struct InfoSheet: View {
                     .padding(.bottom, 45.0)
             }
             .frame(maxWidth: .infinity)
-            .background(Color.white)
+            .background(Color(colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemGray6)))
             .clipShape(RoundedCorners(radius: 16, corners: [.topLeft, .topRight]))
             //            .padding(.horizontal, 20)
             .offset(y: dragOffset > 0 ? dragOffset : 0) // follows drag

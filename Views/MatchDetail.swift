@@ -122,7 +122,7 @@ struct MatchDetailView: View {
                             .padding(.bottom, 38)
                             // Tabs
                             HStack(spacing: 0) {
-                                ForEach(["Summary", "Games"], id: \.self) { tab in
+                                ForEach(["Summary", "Head-to-Head"], id: \.self) { tab in
                                     Button { selectedTab = tab } label: {
                                         VStack(spacing: 4) {
                                             Text(tab)
@@ -418,5 +418,5 @@ func pickTeamColor(
 
 
 #Preview {
-    MatchDetailView(gameId:316)
+    MatchDetailView(gameId:9001)
 }

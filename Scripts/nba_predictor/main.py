@@ -8,12 +8,20 @@ import firebase_admin
 from datetime import datetime, timedelta
 from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.stats.static import teams as nba_teams_static
+from google.cloud import secretmanager
+from openai import OpenAI
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app()
 
 db = firestore.client()
 BUCKET_NAME = "statistiq-models"
+
+def get_openai_key():
+    client = secretmanager.SecretManagerServiceClient()
+    name = "projects/statistiq-5158d/secrets/openai_api_key/versions/latest"
+    response = client.access_secret_version(name=name)
+    return response.payload.data.decode("UTF-8")
 
 def load_from_gcs(filename):
     client = storage.Client()
@@ -69,7 +77,10 @@ def load_team_mapping():
             print(f"WARNING: Team '{team_name}' not found in nba_api.")
             continue
 
-        mapping[firebase_id] = nba_id
+        mapping[firebase_id] = {
+            "name": team_name,
+            "nba_id": nba_id
+        }
 
     print(f"Loaded team mapping: {len(mapping)} teams.")
     return mapping
@@ -178,6 +189,64 @@ def build_feature_payload(df, home_id, away_id):
         "winrate_diff": home["season_win_pct"] - away["season_win_pct"],
     }
 
+def generate_prediction_summary(api_key, home_name, away_name, win_home, win_away,
+                                margin, home_min, home_max, away_min, away_max, ot_prob):
+
+    client = OpenAI(api_key=api_key)
+
+    prompt = f"""
+    Write a short, neutral 2–3 sentence basketball match preview.
+
+    Home team: {home_name}
+    Away team: {away_name}
+
+    Win probability: {win_home:.1f}% for {home_name}, {win_away:.1f}% for {away_name}
+    Expected margin: {margin:+.1f}
+    Predicted scoring ranges: {home_min}-{home_max} for {home_name}, {away_min}-{away_max} for {away_name}
+    Overtime probability: {ot_prob:.1f}%
+
+    Avoid mentioning AI or models, and write in the tone of a sports analyst.
+    """
+
+    result = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=120,
+        temperature=0.6,
+    )
+
+    return result.choices[0].message.content
+
+def generate_form_summary(api_key, home_name, away_name, home_record, away_record):
+    client = OpenAI(api_key=api_key)
+
+    prompt = f"""
+    Write a short, neutral summary (2 sentences) of the recent form of two NBA teams.
+
+    {home_name} recent form:
+    Wins: {home_record['wins']}
+    Losses: {home_record['losses']}
+    Total games: {home_record['games']}
+
+    {away_name} recent form:
+    Wins: {away_record['wins']}
+    Losses: {away_record['losses']}
+    Total games: {away_record['games']}
+
+    Focus on trends, momentum, and how each team has performed lately.
+    Avoid mentioning AI or predictions.
+    """
+
+    result = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=130,
+        temperature=0.6
+    )
+
+    return result.choices[0].message.content
+
+
 @functions_framework.http
 def predict_games(request):
     today = datetime.utcnow()
@@ -217,8 +286,9 @@ def predict_games(request):
             continue
 
         # convert to NBA TEAM_ID
-        home_id = team_mapping[home_firebase_id]
-        away_id = team_mapping[away_firebase_id]
+        home_id = team_mapping[home_firebase_id]["nba_id"]
+        away_id = team_mapping[away_firebase_id]["nba_id"]
+
         
         home_record = get_team_record(season_df, home_id)
         away_record = get_team_record(season_df, away_id)
@@ -302,8 +372,36 @@ def predict_games(request):
         )[0, 1]
         
         fav_team_id = home_firebase_id if margin >= 0 else away_firebase_id
+        
+        api_key = get_openai_key()
+
+        # Required names
+        home_name = team_mapping[home_firebase_id]["name"]
+        away_name = team_mapping[away_firebase_id]["name"]
+
+        # Convert predictions to percentages
+        win_home_pct = win_prob * 100
+        win_away_pct = (1 - win_prob) * 100
+        ot_pct = ot_prob * 100
+
+        prediction_summary = generate_prediction_summary(
+            api_key,
+            home_name, away_name,
+            win_home_pct, win_away_pct,
+            margin,
+            home_pts - 10, home_pts + 10,
+            away_pts - 10, away_pts + 10,
+            ot_pct
+        )
+
+        # form_summary = generate_form_summary(
+        #     api_key,
+        #     home_name, away_name,
+        #     home_record, away_record
+        # )
 
         # save back to Firestore
+        
         db.collection("games_schedule").document(game_id).update({
             "predictions": {
                 "winProbability": {"home": float(win_prob), "away": float(1 - win_prob)},
@@ -316,6 +414,10 @@ def predict_games(request):
                     "value": float(abs(margin))
                 },
                 "overtimeProbability": float(ot_prob),
+            },
+            "summary": {
+                "prediction": prediction_summary
+                # "currentForm": form_summary
             },
             "home_record": home_record,
             "away_record": away_record,
