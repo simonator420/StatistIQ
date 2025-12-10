@@ -223,7 +223,8 @@ struct Homepage: View {
     func adBanner() -> some View {
         BannerAdView(adUnitID: "ca-app-pub-6108216778743846/4562365415")
             .frame(height: 50)
-            .padding(.bottom, 48)
+            .padding(.bottom, 58)
+            .padding(.top, 12)
     }
 }
 

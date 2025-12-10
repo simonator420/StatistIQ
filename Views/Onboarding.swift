@@ -16,7 +16,7 @@ enum SpotlightRegion {
         case .header:
             return CGRect(x: 60, y: 9, width: 255, height: 30)
         case .teams:
-            return CGRect(x: 8, y: 50, width: 91, height: 60)
+            return CGRect(x: 6, y: 50, width: 191, height: 60)
         case .margin:
             return CGRect(x: 285, y: 55, width: 88, height: 50)
         case .probBar:
@@ -79,11 +79,11 @@ struct MatchCardDummy: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Circle().fill(Color(red: 29/255, green: 66/255, blue: 138/255)).frame(width: 10, height: 10)
-                        Text("Warriors").font(.custom("Jost", size: 16))
+                        Text("Golden State Warriors").font(.custom("Jost", size: 16))
                     }
                     HStack {
                         Circle().fill(Color(red: 249/255, green: 160/255, blue: 27/255)).frame(width: 10, height: 10)
-                        Text("Lakers").font(.custom("Jost", size: 16))
+                        Text("Los Angeles Lakers").font(.custom("Jost", size: 16))
                     }
                 }
 
@@ -168,14 +168,14 @@ struct MatchCardOnboardingView: View {
         .init(title: "Expected Margin",
               text: "Indicates the projected point difference between teams.",
               spotlight: .margin),
+        
+        .init(title: "Win Percentages",
+              text: "Shows the predicted chance of each team winning.",
+              spotlight: .probText),
 
         .init(title: "Win Probability Bar",
               text: "Visual representation of each team's win chance.",
               spotlight: .probBar),
-
-        .init(title: "Win Percentages",
-              text: "Shows the predicted chance of each team winning.",
-              spotlight: .probText)
     ]
 
     var body: some View {

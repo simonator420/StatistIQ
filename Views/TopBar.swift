@@ -66,6 +66,7 @@ struct TopBarView: View {
                                     .font(.system(size: 20, weight: .medium))
                                     .foregroundColor(.white.opacity(0.9))
                                     .padding(.trailing, 19)
+                                    .padding(.top, 10)
                             }
                         }
                     } else if selectedTab == "favorites" {
@@ -179,3 +180,59 @@ struct TopBarView: View {
         return "Joined on \(formatter.string(from: date))"
     }
 }
+
+#if DEBUG
+struct TopBarView_Previews: PreviewProvider {
+    @State static var selectedTab = "matches"
+    @State static var showLeagueSelection = false
+    @State static var currentLeague = "NBA"
+    @State static var isLoggedIn = true
+    @State static var currentUser: [String: Any] = [
+        "username": "PreviewUser",
+        "createdAt": Timestamp(date: Date())
+    ]
+    
+    static var previews: some View {
+        Group {
+            NavigationStack {
+                TopBarView(selectedTab: $selectedTab,
+                           showLeagueSelection: $showLeagueSelection,
+                           currentLeague: $currentLeague,
+                           isLoggedIn: $isLoggedIn,
+                           currentUser: $currentUser)
+            }
+            .previewDisplayName("Matches - Light")
+            .preferredColorScheme(.light)
+            
+            NavigationStack {
+                TopBarView(selectedTab: $selectedTab,
+                           showLeagueSelection: $showLeagueSelection,
+                           currentLeague: $currentLeague,
+                           isLoggedIn: $isLoggedIn,
+                           currentUser: $currentUser)
+            }
+            .previewDisplayName("Matches - Dark")
+            .preferredColorScheme(.dark)
+            
+            NavigationStack {
+                var selected = "profile"
+                return TopBarView(selectedTab: .constant("favorites"),
+                                  showLeagueSelection: .constant(false),
+                                  currentLeague: .constant("NBA"),
+                                  isLoggedIn: .constant(true),
+                                  currentUser: .constant(currentUser))
+            }
+            .previewDisplayName("Favorites")
+
+            NavigationStack {
+                TopBarView(selectedTab: .constant("profile"),
+                           showLeagueSelection: .constant(false),
+                           currentLeague: .constant("NBA"),
+                           isLoggedIn: .constant(true),
+                           currentUser: .constant(currentUser))
+            }
+            .previewDisplayName("Profile")
+        }
+    }
+}
+#endif
