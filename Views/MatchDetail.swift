@@ -18,6 +18,7 @@ struct MatchDetailView: View {
     @State private var showInfoSheet = false
     @State private var infoText: String = ""
     @State private var showLoginToast = false
+    @Namespace private var tabIndicator
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     let logosSize: Int = 60
@@ -123,14 +124,29 @@ struct MatchDetailView: View {
                             // Tabs
                             HStack(spacing: 0) {
                                 ForEach(["Summary", "Head-to-Head"], id: \.self) { tab in
-                                    Button { selectedTab = tab } label: {
-                                        VStack(spacing: 4) {
+                                    Button {
+                                        withAnimation(
+                                                .interactiveSpring(response: 0.3, dampingFraction: 0.9)
+                                            ) {
+                                                selectedTab = tab
+                                            }
+                                        
+                                    } label: {
+                                        VStack(spacing: 6) {
                                             Text(tab)
                                                 .font(.custom("Jost-Medium", size: 15))
                                                 .foregroundColor(selectedTab == tab ? .white : .gray)
-                                            Rectangle()
-                                                .fill(selectedTab == tab ? Color.white : Color(red: 0.12, green: 0.16, blue: 0.27))
-                                                .frame(height: 6)
+
+                                            ZStack {
+                                                if selectedTab == tab {
+                                                    Rectangle()
+                                                        .fill(Color.white)
+                                                        .frame(height: 6)
+                                                        .matchedGeometryEffect(id: "tabIndicator", in: tabIndicator)
+                                                } else {
+                                                    Color.clear.frame(height: 6)
+                                                }
+                                            }
                                         }
                                         .frame(maxWidth: .infinity)
                                     }

@@ -12,17 +12,29 @@ struct MatchDetailContentView: View {
 
     var body: some View {
         ScrollViewReader { proxy in
-            
             ScrollView {
                 VStack(spacing: 0) {
                     Color.clear
                         .frame(height: 20)
                         .id("top")
-                    if selectedTab == "Summary" {
-                        summarySection
-                    } else if selectedTab == "Head-to-Head" {
-                        gamesSection
+                    
+                    // Wrap content in ZStack with transition
+                    ZStack {
+                        if selectedTab == "Summary" {
+                            summarySection
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .leading),
+                                    removal: .move(edge: .leading)
+                                ))
+                        } else if selectedTab == "Head-to-Head" {
+                            gamesSection
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .trailing),
+                                    removal: .move(edge: .trailing)
+                                ))
+                        }
                     }
+                    .animation(.interactiveSpring(response: 0.3, dampingFraction: 0.9), value: selectedTab)
                 }
                 .frame(maxWidth: .infinity)
             }
