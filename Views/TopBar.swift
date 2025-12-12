@@ -40,9 +40,9 @@ struct TopBarView: View {
                                 }
                             } label: {
                                 HStack(spacing: 10) {
-                                    Image("\(currentLeague)_logo".lowercased())
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
+//                                    Image("\(currentLeague)_logo".lowercased())
+//                                        .resizable()
+//                                        .frame(width: 30, height: 30)
 
                                     Text(currentLeague)
                                         .font(.custom("Jost-SemiBold", size: 22))
@@ -150,7 +150,7 @@ struct TopBarView: View {
                         }
                     }
                 }
-                    .padding(.top, 10)
+                    .padding(.top, 13)
                     .padding(.leading, selectedTab == "profile" ? 0 : 24),
                 alignment: .topLeading
             )
@@ -215,12 +215,11 @@ struct TopBarView_Previews: PreviewProvider {
             .preferredColorScheme(.dark)
             
             NavigationStack {
-                var selected = "profile"
                 return TopBarView(selectedTab: .constant("favorites"),
-                                  showLeagueSelection: .constant(false),
-                                  currentLeague: .constant("NBA"),
-                                  isLoggedIn: .constant(true),
-                                  currentUser: .constant(currentUser))
+                  showLeagueSelection: .constant(false),
+                  currentLeague: .constant("NBA"),
+                  isLoggedIn: .constant(true),
+                  currentUser: .constant(currentUser))
             }
             .previewDisplayName("Favorites")
 

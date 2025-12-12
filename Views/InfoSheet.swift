@@ -25,11 +25,11 @@ struct InfoSheet: View {
                 
                 // Info Text
                 Text(infoText)
-                    .font(.custom("Jost", size: 16).weight(.light))
+                    .font(.custom("Jost-Regular", size: 15))
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.leading)
-                    .padding(.horizontal, 35.0)
-                    .padding(.bottom, 45.0)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 45)
             }
             .frame(maxWidth: .infinity)
             .background(Color(colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemGray6)))

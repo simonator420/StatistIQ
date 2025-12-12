@@ -26,6 +26,7 @@ struct MatchDetailContentView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
+            .background(Color(.systemGroupedBackground))
             .onChange(of: selectedTab) {
                 proxy.scrollTo("top", anchor: .top)
             }
@@ -36,7 +37,7 @@ struct MatchDetailContentView: View {
 private extension MatchDetailContentView {
     // MARK: - SUMMARY SECTION
     var summarySection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 12) {
             winProbabilityCard
             predictedRangeCard
             expectedMarginCard
@@ -140,7 +141,7 @@ private extension MatchDetailContentView {
 
     // MARK: - GAMES SECTION
     var gamesSection: some View {
-        VStack(spacing: 25) {
+        VStack(spacing: 17.5) {
             if vm.h2h.isEmpty {
                 Text("No recent head-to-head games found.")
                     .font(.custom("Jost", size: 15).weight(.medium))
@@ -218,16 +219,20 @@ private extension MatchDetailContentView {
         }
         .padding(10)
         .frame(maxWidth: .infinity)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(colorScheme == .light ? .white : .systemGray6))
+                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+        )
         .padding(.horizontal, 12)
     }
 
     func headerWithInfo(_ title: String, text: String) -> some View {
         HStack(spacing: 4) {
             Text(title)
-                .font(.custom("Jost", size: 15).weight(.medium))
+                .font(.custom("Jost-Medium", size: 13))
                 .foregroundColor(.gray)
+                .padding(.trailing, 2)
             Button {
                 infoText = text
                 showInfoSheet = true
@@ -243,19 +248,22 @@ private extension MatchDetailContentView {
     func predictionSummaryCardView(_ text: String?) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Match Preview")
-                .font(.custom("Jost", size: 15).weight(.medium))
+                .font(.custom("Jost-Medium", size: 13))
                 .foregroundColor(.gray)
 
             Text(text ?? "No preview available.")
-                .font(.custom("Jost", size: 15).weight(.light))
+                .font(.custom("Jost-Regular", size: 15))
                 .foregroundColor(mainTextColor.opacity(0.75))
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(colorScheme == .light ? .white : .systemGray6))
+                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+        )
         .padding(.horizontal, 16)
     }
 }
@@ -281,26 +289,29 @@ private extension MatchDetailContentView {
     private func expectedMarginDot(for teamId: Int?) -> some View {
         guard
             let tid = teamId,
-            let t = teams.team(tid)
+            let team = teams.team(tid)
         else {
-            return Circle()
-                .fill(Color.gray.opacity(0.4))
-                .frame(width: 14, height: 14)
+            return AnyView(
+                Circle()
+                    .fill(Color.gray.opacity(0.4))
+                    .frame(width: 14, height: 14)
+            )
         }
 
         let opponentId = tid == vm.model?.homeId ? vm.model?.awayId : vm.model?.homeId
-        let opponentPrimary = opponentId.flatMap { teams.team($0)?.primaryColor }
 
-        let color = pickTeamColor(
-            primary: t.primaryColor,
-            secondary: t.secondaryColor,
-            opponentPrimary: opponentPrimary
+        let primary = Color(hex: team.primaryColor) ?? .gray
+        let secondary = Color(hex: team.secondaryColor) ?? primary
+
+        return AnyView(
+            TeamHalfColorDot(
+                primary: primary,
+                secondary: secondary,
+                size: 14
+            )
         )
-
-        return Circle()
-            .fill(color)
-            .frame(width: 14, height: 14)
     }
+
     
     private func expectedMarginLabel(
         home: Double,

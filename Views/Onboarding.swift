@@ -78,12 +78,16 @@ struct MatchCardDummy: View {
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Circle().fill(Color(red: 29/255, green: 66/255, blue: 138/255)).frame(width: 10, height: 10)
-                        Text("Golden State Warriors").font(.custom("Jost", size: 16))
+                        TeamHalfColorDot (primary: Color(red: 29/255, green: 66/255, blue: 138/255), secondary: Color(red: 255/255, green: 199/255, blue: 44/255), size: 10)
+                        Text("Golden State Warriors")
+                            .font(.custom("Jost", size: 16).weight(.medium)
+                            )
                     }
                     HStack {
-                        Circle().fill(Color(red: 249/255, green: 160/255, blue: 27/255)).frame(width: 10, height: 10)
-                        Text("Los Angeles Lakers").font(.custom("Jost", size: 16))
+                        TeamHalfColorDot (primary: Color(red: 85/255, green: 37/255, blue: 130/255), secondary: Color(red: 249/255, green: 160/255, blue: 27/255), size: 10)
+                        Text("Los Angeles Lakers")
+                            .font(.custom("Jost", size: 16).weight(.medium)
+                        )
                     }
                 }
 

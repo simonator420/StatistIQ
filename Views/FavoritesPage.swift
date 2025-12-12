@@ -24,7 +24,7 @@ struct FavoritesPage: View {
                         .padding(.top, 8)
                     
                     Text("Sign in to view the matches of your favorite teams.")
-                        .font(.custom("Jost", size: 16).weight(.medium))
+                        .font(.custom("Jost", size: 16).weight(.regular))
                         .multilineTextAlignment(.center)
                         .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
                         .frame(width: 270, alignment: .center)

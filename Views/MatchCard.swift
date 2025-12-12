@@ -30,12 +30,12 @@ struct MatchCard: View {
                     HStack(spacing: 6) {
                         if let start = m.startTime {
                             Text(shortTime(start))
-                                .font(.custom("Jost", size: 13))
+                                .font(.custom("Jost-Regular", size: 13))
                                 .foregroundColor(.secondary)
                         }
                         
                         Text("·")
-                            .font(.custom("Jost", size: 13))
+                            .font(.custom("Jost-Regular", size: 13))
                             .foregroundColor(.secondary)
                         
                         if let homeId = m.homeId,
@@ -43,7 +43,7 @@ struct MatchCard: View {
                                let city = teams.city(for: homeId) {
 //                                Text("\(venueShort("\(arena), \(city)"))")
                                 Text("\(arena), \(city)")
-                                    .font(.custom("Jost", size: 13))
+                                    .font(.custom("Jost-Regular", size: 13))
                                     .foregroundColor(.secondary)
                                     .lineLimit(1)
                             }
@@ -219,21 +219,16 @@ struct MatchCard: View {
         let secondary = team?.secondaryColor
         let opponentId = (teamId == vm.model?.homeId) ? vm.model?.awayId : vm.model?.homeId
         let opponentPrimary = opponentId.flatMap { teams.team($0)?.primaryColor }
-
-        let color = pickTeamColor(
-            primary: primary,
-            secondary: secondary,
-            opponentPrimary: opponentPrimary
-        )
-
         return HStack(spacing: 8) {
-            Circle()
-                .fill(color)
-                .frame(width: 10, height: 10)
+            TeamHalfColorDot(
+                primary: Color(hex: primary) ?? .gray,
+                secondary: Color(hex: secondary) ?? .gray,
+                size: 10
+            )
 
             Text(name)
 //                .font(.custom("Jost-SemiBold", size: 16))
-                .font(.custom("Jost", size: 16).weight(.light))
+                .font(.custom("Jost", size: 16).weight(.medium))
                 .foregroundColor(.primary)
                 .lineLimit(1)
         }
@@ -365,6 +360,21 @@ struct ProbBar: View {
     }
 }
 
-#Preview {
-    MatchCard(gameId: 9001)
+
+struct TeamHalfColorDot: View {
+    let primary: Color
+    let secondary: Color
+    let size: CGFloat
+
+    var body: some View {
+        ZStack {
+            HStack(spacing: 0) {
+                primary
+                secondary
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+        .rotationEffect(.degrees(45))
+    }
 }

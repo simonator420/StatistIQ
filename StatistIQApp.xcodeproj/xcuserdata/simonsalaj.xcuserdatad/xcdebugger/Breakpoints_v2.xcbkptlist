@@ -14,8 +14,8 @@
             filePath = "Views/MatchDetailContentView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "160"
-            endingLineNumber = "160"
+            startingLineNumber = "161"
+            endingLineNumber = "161"
             landmarkName = "pastGameRow(_:)"
             landmarkType = "7">
          </BreakpointContent>

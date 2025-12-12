@@ -9,3 +9,4 @@ joblib
 scikit-learn
 nba_api
 requests
+catboost

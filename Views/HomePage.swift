@@ -17,7 +17,7 @@ struct Homepage: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(colorScheme == .light ? Color.white : Color(.black))
+                Color(.systemGroupedBackground)
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {

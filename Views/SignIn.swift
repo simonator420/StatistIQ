@@ -43,7 +43,7 @@ struct SignInView: View {
                             Spacer()
                         }
                             .padding(.leading, 16)
-                            .padding(.top, 15),
+                            .padding(.top, 13),
                         alignment: .topLeading
                     )
                 

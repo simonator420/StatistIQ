@@ -59,7 +59,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Cabin-SemiBold.ttf",
+				"Jost-Light.ttf",
 				"Jost-Medium.ttf",
+				"Jost-Regular.ttf",
 				"Jost-SemiBold.ttf",
 			);
 			target = A96FF6932E341E770040EC24 /* StatistIQAppTests */;
@@ -68,7 +70,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Cabin-SemiBold.ttf",
+				"Jost-Light.ttf",
 				"Jost-Medium.ttf",
+				"Jost-Regular.ttf",
 				"Jost-SemiBold.ttf",
 			);
 			target = A96FF69D2E341E770040EC24 /* StatistIQAppUITests */;

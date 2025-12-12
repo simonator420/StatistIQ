@@ -126,7 +126,7 @@ struct MatchDetailView: View {
                                     Button { selectedTab = tab } label: {
                                         VStack(spacing: 4) {
                                             Text(tab)
-                                                .font(.custom("Jost-SemiBold", size: 15))
+                                                .font(.custom("Jost-Medium", size: 15))
                                                 .foregroundColor(selectedTab == tab ? .white : .gray)
                                             Rectangle()
                                                 .fill(selectedTab == tab ? Color.white : Color(red: 0.12, green: 0.16, blue: 0.27))
@@ -252,19 +252,19 @@ struct MatchDetailView: View {
             }
             
             Text(t?.name ?? fallback)
-                .font(.custom("Jost-SemiBold", size: 15))
+                .font(.custom("Jost-Medium", size: 15))
                 .foregroundColor(.white)
                 .padding(.top, 5)
             
             // NEW — record inline, without extra view
             if let r = record {
                 Text("\(r.wins)-\(r.losses)")
-                    .font(.custom("Jost-SemiBold", size: 15))
+                    .font(.custom("Jost-Medium", size: 15))
                     .foregroundColor(.white.opacity(0.9))
                 //                    .padding(.top, 2)
             } else {
                 Text("–")
-                    .font(.custom("Jost-SemiBold", size: 15))
+                    .font(.custom("Jost-Medium", size: 15))
                     .foregroundColor(.white.opacity(0.5))
                 //                    .padding(.top, 2)
             }
@@ -409,14 +409,14 @@ func pickTeamColor(
     }
 
     //Avoid primaries too similar to opponent
-    if isSimilar(rgbPrimary, rgbOpponent) {
-        if let sec = Color(hex: secondary) { return sec }
-    }
+//    if isSimilar(rgbPrimary, rgbOpponent) {
+//        if let sec = Color(hex: secondary) { return sec }
+//    }
 
     return Color(hex: primary) ?? .white
 }
 
 
 #Preview {
-    MatchDetailView(gameId:9001)
+    MatchDetailView(gameId:9015)
 }

@@ -16,73 +16,72 @@ struct PastGameCard: View {
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemGray6)))
-                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
-                .frame(height: 100)
-                .padding(.horizontal, 16)
-            
-            VStack(spacing: 8) {
-                // Scores + Logos
-                HStack(spacing: 0) {
-                    // Home team (logo + score)
-                    HStack(spacing: 2) {
-                        VStack(spacing:1){
-                            Text(homeAbbr)
-                                .font(.custom("Jost", size: 22).weight(homeWon ? .bold : .light))
-                                .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
-                                .frame(width: 65)
-                            
-                            Rectangle()
-                                .fill(homePrimaryColor)
-                                .frame(width: 30, height: 3)
-                        }
-                        Text(homeScore)
-                            .font(.custom("Jost", size: 22).weight(homeWon ? .bold : .light))
-                            .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
-                            .monospacedDigit()
-                            .frame(width: homeScore.count == 3 ? 65 : 55, alignment: .trailing)
+        VStack(spacing: 8) {
+
+            // Scores + Logos
+            HStack(spacing: 0) {
+
+                // Home team
+                HStack(spacing: 2) {
+                    VStack(spacing: 1) {
+                        Text(homeAbbr)
+                            .font(.custom("Jost", size: 22).weight(homeWon ? .medium : .regular))
+                            .foregroundColor(mainTextColor)
+                            .frame(width: 65)
+
+                        Rectangle()
+                            .fill(homePrimaryColor)
+                            .frame(width: 30, height: 3)
                     }
-                    
-                    Text("–")
-                        .font(.custom("Jost", size: 22).weight(.light))
-                        .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
-                        .padding(.horizontal, 18)
-                    
-                    // Away team (score + logo)
-                    HStack(spacing: 2) {
-                        Text(awayScore)
-                            .font(.custom("Jost", size: 22).weight(awayWon ? .bold : .light))
-                            .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
-                            .monospacedDigit()
-                            .frame(width: awayScore.count == 3 ? 65 : 55, alignment: .leading)
-                        VStack(spacing:1){
-                            Text(awayAbbr)
-                                .font(.custom("Jost", size: 22).weight(awayWon ? .bold : .medium))
-                                .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
-                                .frame(width: 65)
-                            
-                            Rectangle()
-                                .fill(awayPrimaryColor)
-                                .frame(width: 28, height: 3)
-                        }
-                    }
+
+                    Text(homeScore)
+                        .font(.custom("Jost", size: 22).weight(homeWon ? .medium : .regular))
+                        .foregroundColor(mainTextColor)
+                        .monospacedDigit()
+                        .frame(width: homeScore.count == 3 ? 65 : 55, alignment: .trailing)
                 }
-                
-                // Date + Venue
-                VStack(spacing: 6) {
-                    Text(date)
-                        .font(.custom("Jost", size: 16).weight(.medium))
-                        .foregroundColor(Color(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white))
-                    
-                    //                    Text(venue)
-                    //                        .font(.custom("Jost", size: 16).weight(.medium))
-                    //                        .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+
+                Text("–")
+                    .font(.custom("Jost", size: 22))
+                    .foregroundColor(mainTextColor)
+                    .padding(.horizontal, 18)
+
+                // Away team
+                HStack(spacing: 2) {
+                    Text(awayScore)
+                        .font(.custom("Jost", size: 22).weight(awayWon ? .medium : .regular))
+                        .foregroundColor(mainTextColor)
+                        .monospacedDigit()
+                        .frame(width: awayScore.count == 3 ? 65 : 55, alignment: .leading)
+
+                    VStack(spacing: 1) {
+                        Text(awayAbbr)
+                            .font(.custom("Jost", size: 22).weight(awayWon ? .medium : .regular))
+                            .foregroundColor(mainTextColor)
+                            .frame(width: 65)
+
+                        Rectangle()
+                            .fill(awayPrimaryColor)
+                            .frame(width: 28, height: 3)
+                    }
                 }
             }
+
+            // Date
+            Text(date)
+                .font(.custom("Jost", size: 15).weight(.medium))
+                .foregroundColor(mainTextColor.opacity(0.75))
         }
+        .padding(10)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(colorScheme == .light ? .white : .systemGray6))
+                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+        )
+        .padding(.horizontal, 12)
     }
+
     private var mainTextColor: Color {
         colorScheme == .light
         ? Color(red: 0.12, green: 0.16, blue: 0.27)
@@ -115,12 +114,12 @@ struct PastGameCard: View {
         )
         
         PastGameCard(
-            homePrimaryColor: Color(.red),
-            awayPrimaryColor: Color(.blue),
+            homePrimaryColor: Color(.blue),
+            awayPrimaryColor: Color(.red),
             homeId: 145,
             awayId: 149,
-            homeAbbr: "134",
-            awayAbbr: "135",
+            homeAbbr: "GSW",
+            awayAbbr: "PHX",
             homeScore: "98",
             awayScore: "127",
             date: "20/02/2025",
@@ -132,8 +131,8 @@ struct PastGameCard: View {
             awayPrimaryColor: Color(.blue),
             homeId: 145,
             awayId: 149,
-            homeAbbr: "141",
-            awayAbbr: "145",
+            homeAbbr: "PHX",
+            awayAbbr: "GSW",
             homeScore: "101",
             awayScore: "92",
             date: "19/02/2025",
