@@ -24,43 +24,24 @@ struct ProfilePage: View {
                     VStack(spacing:20) {
                         
                         // BENEFITS (no alerts)
+                        // BENEFITS (white text, rounded)
                         VStack(spacing: 12) {
-                            HStack(alignment: .center, spacing: 10) {
-                                Image(systemName: "star.fill")
-                                    .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
-                                    .frame(width: 22)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Favorites feed")
-                                        .font(.custom("Jost", size: 15).weight(.semibold))
-                                    Text("All your teams in one place.")
-                                        .font(.custom("Jost", size: 13))
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
-                            }
-                            .padding(12)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                            .padding(.top, 15)
-                            
-                            HStack(alignment: .center, spacing: 10) {
-                                Image(systemName: "chart.bar.fill")
-                                    .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
-                                    .frame(width: 22)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("AI predictions")
-                                        .font(.custom("Jost", size: 15).weight(.semibold))
-                                    Text("Win probabilities and expected margins.")
-                                        .font(.custom("Jost", size: 13))
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
-                            }
-                            .padding(12)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
+
+                            benefitCard(
+                                icon: "star.fill",
+                                title: "Favorites feed",
+                                subtitle: "All your teams in one place."
+                            )
+
+                            benefitCard(
+                                icon: "chart.bar.fill",
+                                title: "AI predictions",
+                                subtitle: "Win probabilities and expected margins."
+                            )
                         }
                         .padding(.horizontal)
+                        .padding(.top, 15)
+
                         
                         // PRIMARY CTA
                         NavigationLink(destination: SignInView(onLogin: {
@@ -155,30 +136,15 @@ struct ProfilePage: View {
                         //                                    }
                         Spacer()
                         
-                        HStack {
-                            Text("Manage favorites")
-                                .font(.custom("Jost", size: 16).weight(.medium))
-                                .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .rotationEffect(.degrees(isFavoritesExpanded ? 90 : 0)) // rotates right -> down
-                                .foregroundColor(colorScheme == .light ? Color(red: 0.12, green: 0.16, blue: 0.27) : Color.white)
-                                .font(.system(size: 16, weight: .semibold))
-                            //  .contentTransition(.symbolEffect)
-                                .animation(.easeInOut(duration: 0.2), value: isFavoritesExpanded)
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
+                        Button {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 isFavoritesExpanded.toggle()
                             }
+                        } label: {
+                            manageFavoritesCard()
                         }
+                        .buttonStyle(.plain)
+
                         
                         if isFavoritesExpanded {
                             VStack(alignment: .leading, spacing: 12) {
@@ -235,15 +201,27 @@ struct ProfilePage: View {
                                         }
                                         .padding(.vertical, 6)
                                         .padding(.horizontal, 8)
-                                        .background(Color(.systemGray6))
-                                        .cornerRadius(8)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                .fill(Color(colorScheme == .light ? .white : .systemGray6))
+                                        )
+
                                     }
                                 }
                             }
                             .padding(12)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(Color(colorScheme == .light ? .white : .systemGray6))
+                                    .shadow(
+                                        color: .black.opacity(colorScheme == .light ? 0.08 : 0),
+                                        radius: 8,
+                                        x: 0,
+                                        y: 2
+                                    )
+                            )
                             .transition(.opacity.combined(with: .move(edge: .top)))
+
                         }
                         
                         HStack {
@@ -319,5 +297,79 @@ struct ProfilePage: View {
             .fill(picked)
             .frame(width: 16, height: 16)
     }
+    
+    private func benefitCard(icon: String, title: String, subtitle: String) -> some View {
+            let mainTextColor =
+                colorScheme == .light
+                ? Color(red: 0.12, green: 0.16, blue: 0.27)
+                : Color.white
+
+            return HStack(spacing: 12) {
+
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(mainTextColor)
+                    .frame(width: 28)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.custom("Jost", size: 15).weight(.semibold))
+                        .foregroundColor(mainTextColor)
+
+                    Text(subtitle)
+                        .font(.custom("Jost", size: 13))
+                        .foregroundColor(mainTextColor.opacity(0.7))
+                }
+
+                Spacer()
+            }
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color(colorScheme == .light ? .white : .systemGray6))
+                    .shadow(
+                        color: .black.opacity(colorScheme == .light ? 0.08 : 0),
+                        radius: 8,
+                        x: 0,
+                        y: 2
+                    )
+            )
+        }
+    
+    private func manageFavoritesCard() -> some View {
+        let mainTextColor =
+            colorScheme == .light
+            ? Color(red: 0.12, green: 0.16, blue: 0.27)
+            : Color.white
+
+        return HStack {
+            Text("Manage favorites")
+                .font(.custom("Jost", size: 16).weight(.medium))
+                .foregroundColor(mainTextColor)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .rotationEffect(.degrees(isFavoritesExpanded ? 90 : 0))
+                .foregroundColor(mainTextColor)
+                .font(.system(size: 16, weight: .semibold))
+                .animation(.easeInOut(duration: 0.2), value: isFavoritesExpanded)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(colorScheme == .light ? .white : .systemGray6))
+                .shadow(
+                    color: .black.opacity(colorScheme == .light ? 0.08 : 0),
+                    radius: 8,
+                    x: 0,
+                    y: 2
+                )
+        )
+    }
+
+
+
 
 }

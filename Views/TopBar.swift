@@ -28,33 +28,37 @@ struct TopBarView: View {
                         HStack(spacing: 12) {
 
                             // League toggle button (your original button)
-                            Button {
-                                let spin = reduceMotion ? 0.0 : 0.25
-                                withAnimation(.linear(duration: spin)) {
-                                    rotate = (rotate + 180).truncatingRemainder(dividingBy: 360)
+//                            Button {
+//                                let spin = reduceMotion ? 0.0 : 0.25
+//                                withAnimation(.linear(duration: spin)) {
+//                                    rotate = (rotate + 180).truncatingRemainder(dividingBy: 360)
+//                                }
+//
+//                                let t = Transaction(animation: nil)
+//                                withTransaction(t) {
+//                                    currentLeague = (currentLeague == "NBA") ? "Euroleague" : "NBA"
+//                                }
+//                            } label: {
+//                                HStack(spacing: 10) {
+//
+//                                    Text(currentLeague)
+//                                        .font(.custom("Jost-SemiBold", size: 22))
+//                                        .foregroundColor(.white)
+//
+//                                    Image(systemName: "arrow.triangle.2.circlepath")
+//                                        .font(.system(size: 22, weight: .bold))
+//                                        .foregroundColor(.white)
+//                                        .rotationEffect(.degrees(rotate))
+//                                }
+//                                .contentShape(Rectangle())
+//                            }
+                            Text("Upcoming Games")
+                                .font(.custom("Jost-SemiBold", size: 22))
+                                .foregroundColor(.white)
+                                .onAppear {
+                                    currentLeague = "NBA"
                                 }
 
-                                let t = Transaction(animation: nil)
-                                withTransaction(t) {
-                                    currentLeague = (currentLeague == "NBA") ? "Euroleague" : "NBA"
-                                }
-                            } label: {
-                                HStack(spacing: 10) {
-//                                    Image("\(currentLeague)_logo".lowercased())
-//                                        .resizable()
-//                                        .frame(width: 30, height: 30)
-
-                                    Text(currentLeague)
-                                        .font(.custom("Jost-SemiBold", size: 22))
-                                        .foregroundColor(.white)
-
-                                    Image(systemName: "arrow.triangle.2.circlepath")
-                                        .font(.system(size: 22, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .rotationEffect(.degrees(rotate))
-                                }
-                                .contentShape(Rectangle())
-                            }
                             
                             Spacer()
                             
@@ -66,7 +70,7 @@ struct TopBarView: View {
                                     .font(.system(size: 20, weight: .medium))
                                     .foregroundColor(.white.opacity(0.9))
                                     .padding(.trailing, 19)
-                                    .padding(.top, 10)
+                                    .padding(.top, 3)
                             }
                         }
                     } else if selectedTab == "favorites" {

@@ -21,7 +21,8 @@ struct InfoSheet: View {
                     .frame(width: 66, height: 3)
                     .cornerRadius(1.5)
                     .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
-                    .padding(.vertical, 18)
+                    .padding(.top, 18)
+                    .padding(.bottom, 4)
                 
                 // Info Text
                 Text(infoText)

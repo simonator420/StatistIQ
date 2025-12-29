@@ -206,7 +206,7 @@ struct Homepage: View {
 //        //            .padding(.horizontal, 16)
 //            .overlay(
 //                Text("Ad Banner")
-//                    .foregroundColor(.black) // Text color
+//                    .foregroundColor(.black                           ) // Text color
 //                    .font(.custom("Jost-Medium", size: 16))
 //            )
 //    }

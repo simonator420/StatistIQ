@@ -7,6 +7,7 @@ final class GamesScheduleStore: ObservableObject {
     @Published var gameIds: [Int] = []
     @Published var gameMeta: [Int: (homeId: Int, awayId: Int)] = [:]
     @Published var gameStart: [Int: Date] = [:]
+    @Published var refreshPulse = UUID()
     
     @Published var isLoading: Bool = false
     private var listener: ListenerRegistration?
