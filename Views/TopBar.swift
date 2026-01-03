@@ -20,38 +20,13 @@ struct TopBarView: View {
     
     var body: some View {
         Color(red: 0.12, green: 0.16, blue: 0.27)
+            .frame(maxWidth: .infinity)
+            .frame(height: selectedTab == "profile" ? (isLoggedIn ? 265 : 250) : 60)
             .ignoresSafeArea(.all, edges: .top)
-            .frame(height: selectedTab == "profile" ? (isLoggedIn == true ? 265 : 250) : 60)
             .overlay(
                 Group {
                     if selectedTab == "matches" {
                         HStack(spacing: 12) {
-
-                            // League toggle button (your original button)
-//                            Button {
-//                                let spin = reduceMotion ? 0.0 : 0.25
-//                                withAnimation(.linear(duration: spin)) {
-//                                    rotate = (rotate + 180).truncatingRemainder(dividingBy: 360)
-//                                }
-//
-//                                let t = Transaction(animation: nil)
-//                                withTransaction(t) {
-//                                    currentLeague = (currentLeague == "NBA") ? "Euroleague" : "NBA"
-//                                }
-//                            } label: {
-//                                HStack(spacing: 10) {
-//
-//                                    Text(currentLeague)
-//                                        .font(.custom("Jost-SemiBold", size: 22))
-//                                        .foregroundColor(.white)
-//
-//                                    Image(systemName: "arrow.triangle.2.circlepath")
-//                                        .font(.system(size: 22, weight: .bold))
-//                                        .foregroundColor(.white)
-//                                        .rotationEffect(.degrees(rotate))
-//                                }
-//                                .contentShape(Rectangle())
-//                            }
                             Text("Upcoming Games")
                                 .font(.custom("Jost-SemiBold", size: 22))
                                 .foregroundColor(.white)
@@ -59,7 +34,6 @@ struct TopBarView: View {
                                     currentLeague = "NBA"
                                 }
 
-                            
                             Spacer()
                             
                             // INFO ICON (opens onboarding)
@@ -101,14 +75,7 @@ struct TopBarView: View {
                             .padding(.leading, 24)
                             
                             VStack(spacing: 8) {
-//                                Image("avatar_icon")
-//                                    .resizable()
-//                                    .scaledToFit()
-//                                    .frame(width: 160, height: 160)
-//                                    .foregroundColor(.white)
-                                
                                 ZStack(alignment: .bottomTrailing) {
-                                    
                                     Image("user_outline")
                                         .resizable()
                                         .scaledToFit()
@@ -150,7 +117,6 @@ struct TopBarView: View {
                                         .padding(.top, 15)
                                 }
                             }
-                            //                            .padding(.top, 5)
                         }
                     }
                 }
@@ -171,10 +137,8 @@ struct TopBarView: View {
                     }
                 )
             }
-
     }
     
-    // Same formatting helper as in Homepage, kept local for convenience
     private func formattedJoinDate(from timestamp: Timestamp?) -> String {
         guard let timestamp = timestamp else { return "" }
         let date = timestamp.dateValue()
@@ -184,58 +148,3 @@ struct TopBarView: View {
         return "Joined on \(formatter.string(from: date))"
     }
 }
-
-#if DEBUG
-struct TopBarView_Previews: PreviewProvider {
-    @State static var selectedTab = "matches"
-    @State static var showLeagueSelection = false
-    @State static var currentLeague = "NBA"
-    @State static var isLoggedIn = true
-    @State static var currentUser: [String: Any] = [
-        "username": "PreviewUser",
-        "createdAt": Timestamp(date: Date())
-    ]
-    
-    static var previews: some View {
-        Group {
-            NavigationStack {
-                TopBarView(selectedTab: $selectedTab,
-                           showLeagueSelection: $showLeagueSelection,
-                           currentLeague: $currentLeague,
-                           isLoggedIn: $isLoggedIn,
-                           currentUser: $currentUser)
-            }
-            .previewDisplayName("Matches - Light")
-            .preferredColorScheme(.light)
-            
-            NavigationStack {
-                TopBarView(selectedTab: $selectedTab,
-                           showLeagueSelection: $showLeagueSelection,
-                           currentLeague: $currentLeague,
-                           isLoggedIn: $isLoggedIn,
-                           currentUser: $currentUser)
-            }
-            .previewDisplayName("Matches - Dark")
-            .preferredColorScheme(.dark)
-            
-            NavigationStack {
-                return TopBarView(selectedTab: .constant("favorites"),
-                  showLeagueSelection: .constant(false),
-                  currentLeague: .constant("NBA"),
-                  isLoggedIn: .constant(true),
-                  currentUser: .constant(currentUser))
-            }
-            .previewDisplayName("Favorites")
-
-            NavigationStack {
-                TopBarView(selectedTab: .constant("profile"),
-                           showLeagueSelection: .constant(false),
-                           currentLeague: .constant("NBA"),
-                           isLoggedIn: .constant(true),
-                           currentUser: .constant(currentUser))
-            }
-            .previewDisplayName("Profile")
-        }
-    }
-}
-#endif

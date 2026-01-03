@@ -124,7 +124,7 @@ struct FavoritesPage: View {
                                 if let dayGames = grouped[day] {
                                     let headerText = day.formatted(.dateTime.weekday(.wide).day().month().year())
                                     Text(headerText)
-                                        .font(.custom("Jost", size: 16))
+                                        .font(.custom("Jost", size: 16).weight(.medium))
                                         .foregroundColor(.secondary)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(.top, 8)

@@ -224,20 +224,65 @@ struct MatchCardOnboardingView: View {
                 }
                 .tabViewStyle(PageTabViewStyle())
 
-                // ------------- BUTTON -------------
-                Button(action: dismiss) {
-                    Text(index == slides.count - 1 ? "Done" : "Skip")
-                        .font(.custom("Jost", size: 17).weight(.medium))
-                        .foregroundColor(.white)
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 32)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.white.opacity(0.85), lineWidth: 2)
-                        )
+                // ------------- BUTTONS -------------
+                HStack(spacing: 12) {
+
+                    if index < slides.count - 1 {
+
+                        // Skip only when not last
+                        Button(action: dismiss) {
+                            Text("Skip")
+                                .font(.custom("Jost", size: 17).weight(.medium))
+                                .foregroundColor(.white)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 32)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.white.opacity(0.85), lineWidth: 2)
+                                )
+                        }
+
+                        // Next
+                        Button {
+                            let next = index + 1
+
+                            if next == slides.count - 1 {
+                                // ❌ no animation when going to last slide
+                                index = next
+                            } else {
+                                // ✅ animated for all others
+                                withAnimation {
+                                    index = next
+                                }
+                            }
+                        } label: {
+                            Text("Next")
+                                .font(.custom("Jost", size: 17).weight(.medium))
+                                .foregroundColor(.white)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 32)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.white.opacity(0.85), lineWidth: 2)
+                                )
+                        }
+
+                    } else {
+                        // Last slide -> Done
+                        Button(action: dismiss) {
+                            Text("Done")
+                                .font(.custom("Jost", size: 17).weight(.medium))
+                                .foregroundColor(.white)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 32)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.white.opacity(0.85), lineWidth: 2)
+                                )
+                        }
+                    }
                 }
-
-
+                
                 Spacer().frame(height: 40)
             }
         }

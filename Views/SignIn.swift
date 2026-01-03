@@ -9,6 +9,8 @@ import CryptoKit
 
 struct SignInView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    
     var onLogin: (() -> Void)? = nil
     @State private var currentNonce: String?
     
@@ -20,7 +22,7 @@ struct SignInView: View {
     
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color(.systemGroupedBackground).ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Top Bar with Back Button and Title
@@ -51,7 +53,10 @@ struct SignInView: View {
                 VStack(spacing: 20) {
                     Text("StatistIQ")
                         .font(.custom("Jost-SemiBold", size: 28))
-                        .foregroundColor(Color(red: 0.12, green: 0.16, blue: 0.27))
+                        .foregroundColor(colorScheme == .light
+                                         ? Color(red: 0.12, green: 0.16, blue: 0.27)
+                                         : .white)
+
                         .padding(.top, 135)
                     
                     // Sign in buttons
@@ -377,7 +382,10 @@ struct SignInView: View {
         var fullText = AttributedString("By signing in you agree with StatistIQ's Privacy Policy and Terms of Use.")
         
         let normalColor = Color.gray
-        let linkColor = Color(red: 0.12, green: 0.16, blue: 0.27)
+        let linkColor = (colorScheme == .light)
+            ? Color(red: 0.12, green: 0.16, blue: 0.27)
+            : .white
+
         
         fullText.foregroundColor = normalColor
         

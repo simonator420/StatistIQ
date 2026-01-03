@@ -13,63 +13,119 @@ struct Homepage: View {
     @StateObject private var scheduleStore = GamesScheduleStore.shared
     @State private var userListener: ListenerRegistration?
     @Environment(\.colorScheme) var colorScheme
+    @State private var selectedTabIndex: Int = 0
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color(.systemGroupedBackground)
+            VStack(spacing: 0) {
+                Color(red: 0.12, green: 0.16, blue: 0.27)
                     .ignoresSafeArea()
-                
-                VStack(spacing: 0) {
-                    // Top Bar
-                    TopBarView(
-                        selectedTab: $selectedTab,
-                        showLeagueSelection: $showLeagueSelection,
-                        currentLeague: $currentLeague,
-                        isLoggedIn: $isLoggedIn,
-                        currentUser: $currentUser,
-                        onUsernameChanged: { updated in
-                            self.currentUser["username"] = updated
+                    .frame(height: 0)
+                TabView(selection: $selectedTabIndex) {
+                    // Matches page with its TopBar
+                    ZStack(alignment: .top) {
+                        Color(.systemGroupedBackground)
+                            .ignoresSafeArea()
+                        VStack(spacing: 0) {
+                            TopBarView(
+                                selectedTab: .constant("matches"),
+                                showLeagueSelection: $showLeagueSelection,
+                                currentLeague: $currentLeague,
+                                isLoggedIn: $isLoggedIn,
+                                currentUser: $currentUser,
+                                onUsernameChanged: { updated in
+                                    self.currentUser["username"] = updated
+                                }
+                            )
+                            
+                            MatchesPage(
+                                net: net,
+                                currentLeague: $currentLeague,
+                                scheduleStore: scheduleStore
+                            )
                         }
-                    )
-                    
-                    ZStack {
-                        MatchesPage(
-                            net: net,
-                            currentLeague: $currentLeague,
-                            scheduleStore: scheduleStore
-                        )
-                        .opacity(selectedTab == "matches" ? 1 : 0)
-                                .allowsHitTesting(selectedTab == "matches")
-//                                .animation(.easeInOut(duration: 0.22), value: selectedTab)
-                        
-                        FavoritesPage(
-                            isLoggedIn: $isLoggedIn,
-                            currentLeague: $currentLeague,
-                            currentUser: $currentUser,
-                            scheduleStore: scheduleStore,
-                            fetchUserProfile: fetchUserProfile
-                        )
-                        .opacity(selectedTab == "favorites" ? 1 : 0)
-                                .allowsHitTesting(selectedTab == "favorites")
-//                                .animation(.easeInOut(duration: 0.22), value: selectedTab)
-
-                        ProfilePage(
-                            selectedTab: $selectedTab,
-                            isLoggedIn: $isLoggedIn,
-                            currentUser: $currentUser,
-                            fetchUserProfile: fetchUserProfile
-                        )
-                        .opacity(selectedTab == "profile" ? 1 : 0)
-                                .allowsHitTesting(selectedTab == "profile")
-//                                .animation(.easeInOut(duration: 0.22), value: selectedTab)
                     }
-//                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .tag(0)
                     
-                    
-                    adBanner()
-                    
+                    // Favorites page with its TopBar
+                    ZStack(alignment: .top) {
+                        Color(.systemGroupedBackground)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 0) {
+                            TopBarView(
+                                selectedTab: .constant("favorites"),
+                                showLeagueSelection: $showLeagueSelection,
+                                currentLeague: $currentLeague,
+                                isLoggedIn: $isLoggedIn,
+                                currentUser: $currentUser,
+                                onUsernameChanged: { updated in
+                                    self.currentUser["username"] = updated
+                                }
+                            )
+                            
+                            FavoritesPage(
+                                isLoggedIn: $isLoggedIn,
+                                currentLeague: $currentLeague,
+                                currentUser: $currentUser,
+                                scheduleStore: scheduleStore,
+                                fetchUserProfile: fetchUserProfile
+                            )
+                        }
+                    }
+                    .tag(1)
+
+                    // Profile page with its TopBar
+                    ZStack(alignment: .top) {
+                        Color(.systemGroupedBackground)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 0) {
+                            TopBarView(
+                                selectedTab: .constant("profile"),
+                                showLeagueSelection: $showLeagueSelection,
+                                currentLeague: $currentLeague,
+                                isLoggedIn: $isLoggedIn,
+                                currentUser: $currentUser,
+                                onUsernameChanged: { updated in
+                                    self.currentUser["username"] = updated
+                                }
+                            )
+                            
+                            ProfilePage(
+                                selectedTab: $selectedTab,
+                                isLoggedIn: $isLoggedIn,
+                                currentUser: $currentUser,
+                                fetchUserProfile: fetchUserProfile
+                            )
+                        }
+                    }
+                    .tag(2)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .onChange(of: selectedTabIndex) { oldValue, newValue in
+                    switch newValue {
+                    case 0: selectedTab = "matches"
+                    case 1: selectedTab = "favorites"
+                    case 2: selectedTab = "profile"
+                    default: break
+                    }
+                }
+                .onChange(of: selectedTab) { oldValue, newValue in
+                    let newIndex: Int
+                    switch newValue {
+                    case "matches": newIndex = 0
+                    case "favorites": newIndex = 1
+                    case "profile": newIndex = 2
+                    default: return
+                    }
+                    
+                    if newIndex != selectedTabIndex {
+                        selectedTabIndex = newIndex
+                    }
+                }
+                
+                adBanner()
             }
             .overlay(
                 VStack {
@@ -110,7 +166,6 @@ struct Homepage: View {
                 alignment: .top
             )
 
-            
             // Overlay for league selection screen
             .overlay(
                 Group {
@@ -145,7 +200,6 @@ struct Homepage: View {
                 }
             )
         }
-        
         .onAppear {
             scheduleStore.start()
             // Check Firebase or stored flag
@@ -172,7 +226,6 @@ struct Homepage: View {
             userListener?.remove()
             userListener = nil
         }
-        
     }
     
     func fetchUserProfile(uid: String, completion: @escaping ([String: Any]?) -> Void) {
@@ -196,20 +249,6 @@ struct Homepage: View {
             .background(Color(red: 0.12, green: 0.16, blue: 0.27))
             .cornerRadius(10)
     }
-    
-    
-//    func adBanner() -> some View {
-//        Rectangle()
-//            .fill(Color.gray)
-//            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 0)
-//            .frame(height: 60)
-//        //            .padding(.horizontal, 16)
-//            .overlay(
-//                Text("Ad Banner")
-//                    .foregroundColor(.black                           ) // Text color
-//                    .font(.custom("Jost-Medium", size: 16))
-//            )
-//    }
     
     func formattedJoinDate(from timestamp: Timestamp?) -> String {
         guard let timestamp = timestamp else { return "" }

@@ -2,6 +2,7 @@ import SwiftUI
 import FirebaseFirestore
 import Foundation
 import FirebaseAuth
+import UIKit
 
 struct MatchDetailView: View {
     let gameId: Int
@@ -22,7 +23,6 @@ struct MatchDetailView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     let logosSize: Int = 60
-    
     
     var body: some View {
         let modelReady = vm.model != nil
@@ -166,7 +166,12 @@ struct MatchDetailView: View {
                         showInfoSheet: $showInfoSheet,
                         infoText: $infoText,
                     )
+                    
                 }
+                .overlay(
+                        InteractivePopEnabler(isEnabled: selectedTab == "Summary")
+                            .frame(width: 0, height: 0)
+                    )
                 .overlay(
                     ZStack {
                         if showInfoSheet {
@@ -268,7 +273,7 @@ struct MatchDetailView: View {
             }
             
             Text(t?.name ?? fallback)
-                .font(.custom("Jost-Medium", size: 15))
+                .font(.custom("Jost", size: 15)).fontWeight(.semibold)
                 .foregroundColor(.white)
                 .padding(.top, 5)
             
@@ -432,7 +437,56 @@ func pickTeamColor(
     return Color(hex: primary) ?? .white
 }
 
+struct InteractivePopEnabler: UIViewControllerRepresentable {
+    let isEnabled: Bool
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        Controller(isEnabled: isEnabled)
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        (uiViewController as? Controller)?.isEnabled = isEnabled
+    }
+
+    final class Controller: UIViewController, UIGestureRecognizerDelegate {
+        var isEnabled: Bool {
+            didSet { updateGesture() }
+        }
+
+        init(isEnabled: Bool) {
+            self.isEnabled = isEnabled
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            updateGesture()
+        }
+
+        private func updateGesture() {
+            guard let nav = navigationController else { return }
+            guard let pop = nav.interactivePopGestureRecognizer else { return }
+
+            pop.isEnabled = isEnabled
+            pop.delegate = self
+        }
+
+        // Allow the system back swipe to recognize alongside other gestures (TabView paging)
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            true
+        }
+
+        // Only begin when enabled (we control via isEnabled)
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            isEnabled
+        }
+    }
+}
+
 
 #Preview {
-    MatchDetailView(gameId:9015)
+    MatchDetailView(gameId:485)
 }

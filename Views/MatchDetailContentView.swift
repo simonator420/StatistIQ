@@ -9,39 +9,63 @@ struct MatchDetailContentView: View {
     @Binding var showInfoSheet: Bool
     @Binding var infoText: String
     @Environment(\.colorScheme) var colorScheme
+    @State private var selectedTabIndex: Int = 0
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(spacing: 0) {
-                    Color.clear
-                        .frame(height: 20)
-                        .id("top")
-                    
-                    // Wrap content in ZStack with transition
-                    ZStack {
-                        if selectedTab == "Summary" {
-                            summarySection
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .leading),
-                                    removal: .move(edge: .leading)
-                                ))
-                        } else if selectedTab == "Head-to-Head" {
-                            gamesSection
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .trailing),
-                                    removal: .move(edge: .trailing)
-                                ))
-                        }
+        ZStack {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            TabView(selection: $selectedTabIndex) {
+                // Summary Tab
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Color.clear
+                            .frame(height: 20)
+                        
+                        summarySection
                     }
-                    .animation(.interactiveSpring(response: 0.3, dampingFraction: 0.9), value: selectedTab)
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
+                .tag(0)
+                
+                // Head-to-Head Tab
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Color.clear
+                            .frame(height: 20)
+                        
+                        gamesSection
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .tag(1)
             }
-            .background(Color(.systemGroupedBackground))
-            .onChange(of: selectedTab) {
-                proxy.scrollTo("top", anchor: .top)
+            .ignoresSafeArea(edges: .bottom)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+        }
+        .onChange(of: selectedTabIndex) { oldValue, newValue in
+            switch newValue {
+            case 0: selectedTab = "Summary"
+            case 1: selectedTab = "Head-to-Head"
+            default: break
             }
+        }
+        .onChange(of: selectedTab) { oldValue, newValue in
+            let newIndex: Int
+            switch newValue {
+            case "Summary": newIndex = 0
+            case "Head-to-Head": newIndex = 1
+            default: return
+            }
+            
+            if newIndex != selectedTabIndex {
+                selectedTabIndex = newIndex
+            }
+        }
+        .onAppear {
+            // Initialize the tab index based on selectedTab
+            selectedTabIndex = selectedTab == "Summary" ? 0 : 1
         }
     }
 }
@@ -56,7 +80,6 @@ private extension MatchDetailContentView {
             overtimeCard
             predictionSummaryCard
         }
-//        .padding(.top, 25)
     }
 
     // MARK: 1. Win Probability
@@ -136,7 +159,7 @@ private extension MatchDetailContentView {
             headerWithInfo("Overtime Probability", text: """
                 Overtime Probability shows the chance the game is tied after regulation.
                                                 
-                It’s derived from our predicted score-margin distribution.
+                It's derived from our predicted score-margin distribution.
                 
                 A higher value means a tighter matchup; overtime is rare, so most games are in the low single digits.
                 """)
@@ -165,7 +188,6 @@ private extension MatchDetailContentView {
                 }
             }
         }
-//        .padding(.top, 25)
     }
 
     @ViewBuilder
