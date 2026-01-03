@@ -47,6 +47,7 @@ struct Homepage: View {
                     }
                     .tag(0)
                     
+                    
                     // Favorites page with its TopBar
                     ZStack(alignment: .top) {
                         Color(.systemGroupedBackground)
@@ -103,6 +104,12 @@ struct Homepage: View {
                     .tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
+                .background(
+                    PageScrollBounceFix(
+                        currentIndex: selectedTabIndex,
+                        maxIndex: 2
+                    )
+                )
                 .onChange(of: selectedTabIndex) { oldValue, newValue in
                     switch newValue {
                     case 0: selectedTab = "matches"
@@ -127,6 +134,7 @@ struct Homepage: View {
                 
                 adBanner()
             }
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .overlay(
                 VStack {
                     Spacer()
@@ -267,6 +275,62 @@ struct Homepage: View {
     }
 }
 
+struct PageScrollBounceFix: UIViewRepresentable {
+    let currentIndex: Int
+    let maxIndex: Int
+
+    func makeUIView(context: Context) -> UIView {
+        UIView(frame: .zero)
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        DispatchQueue.main.async {
+            guard let scrollView = findScrollView(from: uiView) else { return }
+
+            // Default
+            scrollView.alwaysBounceVertical = false
+            scrollView.isPagingEnabled = true
+
+            if currentIndex == 0 {
+                // zákaz swipu doleva
+                scrollView.bounces = false
+                scrollView.alwaysBounceHorizontal = false
+            } else if currentIndex == maxIndex {
+                // zákaz swipu doprava
+                scrollView.bounces = false
+                scrollView.alwaysBounceHorizontal = false
+            } else {
+                // prostřední stránka – normální chování
+                scrollView.bounces = true
+                scrollView.alwaysBounceHorizontal = true
+            }
+        }
+    }
+
+    private func findScrollView(from view: UIView) -> UIScrollView? {
+        var current: UIView? = view
+        for _ in 0..<12 {
+            if let sv = current as? UIScrollView { return sv }
+            if let found = current?.subviews.compactMap({ deepFindScrollView(in: $0) }).first(where: { $0 != nil }) ?? nil {
+                return found
+            }
+            current = current?.superview
+        }
+        return nil
+    }
+
+    private func deepFindScrollView(in view: UIView) -> UIScrollView? {
+        if let sv = view as? UIScrollView { return sv }
+        for sub in view.subviews {
+            if let found = deepFindScrollView(in: sub) { return found }
+        }
+        return nil
+    }
+}
+
+
+
 #Preview {
     Homepage()
 }
+

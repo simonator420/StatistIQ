@@ -120,7 +120,7 @@ struct MatchDetailView: View {
                                 .padding(.bottom, 40)
                             }
                             .padding(.horizontal, 30)
-                            .padding(.bottom, 38)
+                            .padding(.bottom, 18)
                             // Tabs
                             HStack(spacing: 0) {
                                 ForEach(["Summary", "Head-to-Head"], id: \.self) { tab in
@@ -156,7 +156,7 @@ struct MatchDetailView: View {
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .frame(height: 345.3)
+                    .frame(height: 325.5)
                     
                     // Content
                     MatchDetailContentView(
@@ -272,8 +272,8 @@ struct MatchDetailView: View {
                 }
             }
             
-            Text(t?.name ?? fallback)
-                .font(.custom("Jost", size: 15)).fontWeight(.semibold)
+            Text(t?.abbreviation ?? fallback)
+                .font(.custom("Jost", size: 18)).fontWeight(.semibold)
                 .foregroundColor(.white)
                 .padding(.top, 5)
             
@@ -488,5 +488,5 @@ struct InteractivePopEnabler: UIViewControllerRepresentable {
 
 
 #Preview {
-    MatchDetailView(gameId:485)
+    MatchDetailView(gameId:486)
 }

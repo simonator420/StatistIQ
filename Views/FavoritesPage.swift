@@ -161,8 +161,7 @@ struct FavoritesPage: View {
     
     @MainActor
     private func refresh() async {
-        // Purely cosmetic pause; does not fetch/restart anything
-        try? await Task.sleep(nanoseconds: 400_000_000)
+        try? await Task.sleep(nanoseconds: 300_000_000)
     }
 
 }
