@@ -41,19 +41,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A96FF6872E341E760040EC24 /* StatistIQApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StatistIQApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A96FF6872E341E760040EC24 /* StatistIQ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StatistIQ.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96FF6942E341E770040EC24 /* StatistIQAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StatistIQAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96FF69E2E341E770040EC24 /* StatistIQAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StatistIQAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9E84D092E3AC93F009575DF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A96FF6C22E3421AB0040EC24 /* Exceptions for "StatistIQApp" folder in "StatistIQApp" target */ = {
+		A96FF6C22E3421AB0040EC24 /* Exceptions for "StatistIQApp" folder in "StatistIQ" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = A96FF6862E341E760040EC24 /* StatistIQApp */;
+			target = A96FF6862E341E760040EC24 /* StatistIQ */;
 		};
 		A96FF6EB2E34264C0040EC24 /* Exceptions for "Fonts" folder in "StatistIQAppTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -97,7 +97,7 @@
 		A96FF6892E341E760040EC24 /* StatistIQApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A96FF6C22E3421AB0040EC24 /* Exceptions for "StatistIQApp" folder in "StatistIQApp" target */,
+				A96FF6C22E3421AB0040EC24 /* Exceptions for "StatistIQApp" folder in "StatistIQ" target */,
 				A9E84CD02E3A5A7C009575DF /* Exceptions for "StatistIQApp" folder in "StatistIQAppTests" target */,
 				A9E84CD12E3A5A7C009575DF /* Exceptions for "StatistIQApp" folder in "StatistIQAppUITests" target */,
 			);
@@ -196,7 +196,7 @@
 		A96FF6882E341E760040EC24 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A96FF6872E341E760040EC24 /* StatistIQApp.app */,
+				A96FF6872E341E760040EC24 /* StatistIQ.app */,
 				A96FF6942E341E770040EC24 /* StatistIQAppTests.xctest */,
 				A96FF69E2E341E770040EC24 /* StatistIQAppUITests.xctest */,
 			);
@@ -206,9 +206,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A96FF6862E341E760040EC24 /* StatistIQApp */ = {
+		A96FF6862E341E760040EC24 /* StatistIQ */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A96FF6A82E341E770040EC24 /* Build configuration list for PBXNativeTarget "StatistIQApp" */;
+			buildConfigurationList = A96FF6A82E341E770040EC24 /* Build configuration list for PBXNativeTarget "StatistIQ" */;
 			buildPhases = (
 				A96FF6832E341E760040EC24 /* Sources */,
 				A96FF6842E341E760040EC24 /* Frameworks */,
@@ -225,7 +225,7 @@
 				A9E84D0B2E3B7187009575DF /* Services */,
 				A9E84D0F2E3B71B1009575DF /* Models */,
 			);
-			name = StatistIQApp;
+			name = StatistIQ;
 			packageProductDependencies = (
 				A9E84CD32E3A5C45009575DF /* FirebaseAI */,
 				A9E84CD52E3A5C45009575DF /* FirebaseAnalytics */,
@@ -242,7 +242,7 @@
 				A943DFAA2EE0A447002B95C2 /* GoogleMobileAds */,
 			);
 			productName = StatistIQApp;
-			productReference = A96FF6872E341E760040EC24 /* StatistIQApp.app */;
+			productReference = A96FF6872E341E760040EC24 /* StatistIQ.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A96FF6932E341E770040EC24 /* StatistIQAppTests */ = {
@@ -334,7 +334,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A96FF6862E341E760040EC24 /* StatistIQApp */,
+				A96FF6862E341E760040EC24 /* StatistIQ */,
 				A96FF6932E341E770040EC24 /* StatistIQAppTests */,
 				A96FF69D2E341E770040EC24 /* StatistIQAppUITests */,
 			);
@@ -393,12 +393,12 @@
 /* Begin PBXTargetDependency section */
 		A96FF6962E341E770040EC24 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A96FF6862E341E760040EC24 /* StatistIQApp */;
+			target = A96FF6862E341E760040EC24 /* StatistIQ */;
 			targetProxy = A96FF6952E341E770040EC24 /* PBXContainerItemProxy */;
 		};
 		A96FF6A02E341E770040EC24 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A96FF6862E341E760040EC24 /* StatistIQApp */;
+			target = A96FF6862E341E760040EC24 /* StatistIQ */;
 			targetProxy = A96FF69F2E341E770040EC24 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -537,7 +537,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StatistIQApp/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_CFBundleDisplayName = StatistIQ;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -548,7 +549,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codewithsimon.StatistIQApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codewithsimon.StatistIQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -568,7 +569,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StatistIQApp/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_CFBundleDisplayName = StatistIQ;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -579,7 +581,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codewithsimon.StatistIQApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codewithsimon.StatistIQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -671,7 +673,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A96FF6A82E341E770040EC24 /* Build configuration list for PBXNativeTarget "StatistIQApp" */ = {
+		A96FF6A82E341E770040EC24 /* Build configuration list for PBXNativeTarget "StatistIQ" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A96FF6A92E341E770040EC24 /* Debug */,
